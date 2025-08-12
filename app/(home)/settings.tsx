@@ -1,0 +1,33 @@
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View, Pressable } from "react-native";
+import { useUserStore } from "../../store/userStore";
+import { useRouter } from "expo-router";
+
+export default function Settings() {
+  const router = useRouter();
+  const toggleHasOnboarded = useUserStore((state) => state.toggleHasOnboarded);
+
+  const handlePress = () => {
+    toggleHasOnboarded();
+    router.replace("/onboarding");
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text>Settings</Text>
+      <Pressable onPress={handlePress}>
+        <Text>back to Onboarding</Text>
+      </Pressable>
+      <StatusBar style="auto" />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
