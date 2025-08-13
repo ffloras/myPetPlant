@@ -6,6 +6,7 @@ import PlantActionButton from "./PlantActionButton";
 import PlantImage from "./PlantImage";
 import { useEffect, useState } from "react";
 import { Link } from "expo-router";
+import { useNotificationStore } from "@/store/notificationStore";
 
 type WateringStateType = {
   status: "green" | "alert" | "danger";
@@ -14,7 +15,9 @@ type WateringStateType = {
 
 export default function PlantCard({ plant }: { plant: PlantType }) {
   const waterPlant = usePlantStore((store) => store.waterPlant);
-  const plants = usePlantStore((store) => store.plants);
+  const updateNotification = useNotificationStore(
+    (store) => store.updateNotifications
+  );
   const [wateringState, setWateringState] = useState<WateringStateType>();
 
   const getWateringState = (nextWatering: number): WateringStateType => {
@@ -28,19 +31,37 @@ export default function PlantCard({ plant }: { plant: PlantType }) {
     } else if (nextWatering > startOfToday) {
       return { status: "alert", message: "Water today!" };
     } else {
+      const overdueDays = differenceInDays(Date.now(), nextWatering) + 1;
       return {
         status: "danger",
-        message: `Water me! Overdue ${differenceInDays(
-          nextWatering,
-          Date.now()
-        )} days`,
+        message: `Overdue for ${overdueDays} day${overdueDays > 1 ? "s" : ""}`,
       };
     }
   };
 
+  const handleWaterPlantPressed = () => {
+    const msInDay = 24 * 60 * 60 * 1000;
+    const prevNextWaterAtTimestamp = plant.nextWateredAtTimestamp;
+    const currentNextWateredAtTimestamp =
+      Date.now() + plant.wateringFrequencyDays * msInDay;
+
+    updateNotification(
+      plant.id,
+      prevNextWaterAtTimestamp,
+      currentNextWateredAtTimestamp
+    );
+
+    console.log(
+      prevNextWaterAtTimestamp,
+      currentNextWateredAtTimestamp,
+      plant.wateringFrequencyDays
+    );
+    waterPlant(plant.id);
+  };
+
   useEffect(() => {
     setWateringState(getWateringState(plant.nextWateredAtTimestamp));
-  }, [plants]);
+  }, [plant]);
 
   return (
     <View
@@ -62,7 +83,7 @@ export default function PlantCard({ plant }: { plant: PlantType }) {
         <Text style={styles.dateText}>{wateringState?.message}</Text>
         <PlantActionButton
           icon="check"
-          onPress={() => waterPlant(plant.id)}
+          onPress={handleWaterPlantPressed}
           buttonWidth={50}
         />
       </View>

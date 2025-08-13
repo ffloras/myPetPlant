@@ -20,15 +20,19 @@ import { theme } from "@/themes";
 import { PlantType, usePlantStore } from "@/store/plantStore";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { format } from "date-fns";
+import { useNotificationStore } from "@/store/notificationStore";
 
 export default function PlantEdit() {
   const plantId = useLocalSearchParams().plantId;
   const plant = usePlantStore((store) =>
     store.plants.find((plant) => plant.id === plantId)
   );
-
+  const prevNextWaterAtTimestamp = plant?.nextWateredAtTimestamp;
   const editPlant = usePlantStore((store) => store.editPlant);
   const removePlant = usePlantStore((store) => store.removePlant);
+  const updateNotification = useNotificationStore(
+    (store) => store.updateNotifications
+  );
 
   const [cameraStatus, requestCameraPermission] =
     ImagePicker.useCameraPermissions();
@@ -47,6 +51,7 @@ export default function PlantEdit() {
     plant ? plant.prevLastWateredAtTimestamp : undefined
   );
   const [datePickerVisible, setDatePickerVisible] = useState<boolean>(false);
+
   const router = useRouter();
   const navigation = useNavigation();
 
@@ -155,6 +160,13 @@ export default function PlantEdit() {
     };
 
     editPlant(editedPlant);
+    if (prevNextWaterAtTimestamp && editedPlant.nextWateredAtTimestamp) {
+      updateNotification(
+        editedPlant.id,
+        prevNextWaterAtTimestamp,
+        editedPlant.nextWateredAtTimestamp
+      );
+    }
     router.back();
   };
 
@@ -182,7 +194,7 @@ export default function PlantEdit() {
       );
     }
     return Alert.alert(
-      "Revert Last watered date to previous date?",
+      "Revert to previous last watered date?",
       "Last watered date will be updated upon saving",
       [
         {

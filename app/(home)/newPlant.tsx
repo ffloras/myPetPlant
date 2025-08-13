@@ -19,9 +19,13 @@ import PlantActionButton from "../components/PlantActionButton";
 import { theme } from "@/themes";
 import { PlantType, usePlantStore } from "@/store/plantStore";
 import { useRouter } from "expo-router";
+import { useNotificationStore } from "@/store/notificationStore";
 
 export default function NewPlant() {
   const addPlant = usePlantStore((store) => store.addPlant);
+  const addNotification = useNotificationStore(
+    (store) => store.addNotification
+  );
   const [cameraStatus, requestCameraPermission] =
     ImagePicker.useCameraPermissions();
   const [imageUri, setImageUri] = useState<string>();
@@ -119,8 +123,10 @@ export default function NewPlant() {
       );
     }
 
+    const plantId = uuid.v4();
+
     const newPlant: PlantType = {
-      id: uuid.v4(),
+      id: plantId,
       name: plantName,
       wateringFrequencyDays: Number(frequencyDays),
       nextWateredAtTimestamp: date.getTime(),
@@ -128,6 +134,7 @@ export default function NewPlant() {
     };
 
     addPlant(newPlant);
+    addNotification(plantId, newPlant.nextWateredAtTimestamp);
     router.back();
   };
 
