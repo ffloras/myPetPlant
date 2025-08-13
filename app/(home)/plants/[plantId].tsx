@@ -33,6 +33,9 @@ export default function PlantEdit() {
   const updateNotification = useNotificationStore(
     (store) => store.updateNotifications
   );
+  const deleteNotification = useNotificationStore(
+    (store) => store.deleteNotification
+  );
 
   const [cameraStatus, requestCameraPermission] =
     ImagePicker.useCameraPermissions();
@@ -222,8 +225,9 @@ export default function PlantEdit() {
       {
         text: "Yes",
         onPress: () => {
+          deleteNotification(plant.id, plant.nextWateredAtTimestamp);
           removePlant(plant.id);
-          router.navigate("/");
+          router.back();
         },
         style: "destructive",
       },

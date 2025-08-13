@@ -28,7 +28,7 @@ type notificationStoreType = {
     currentNextWateredAtTimestamp: number
   ) => void;
   resetNotifications: () => void;
-  deleteNotification: () => void;
+  deleteNotification: (plantId: string, nextWateredAtTimestamp: number) => void;
 };
 
 export const useNotificationStore = create(
@@ -72,6 +72,21 @@ export const useNotificationStore = create(
           notifications: updatedNotifications,
         }));
       },
+      deleteNotification: async (
+        plantId: string,
+        nextWateredAtTimestamp: number
+      ) => {
+        const notifications = useNotificationStore.getState().notifications;
+        const updatedNotifications = await handleDeleteNotification(
+          notifications,
+          plantId,
+          nextWateredAtTimestamp
+        );
+        set((state) => ({
+          ...state,
+          notifications: updatedNotifications,
+        }));
+      },
       resetNotifications: async () => {
         await Notifications.cancelAllScheduledNotificationsAsync();
         set((state) => ({
@@ -79,7 +94,6 @@ export const useNotificationStore = create(
           notifications: [],
         }));
       },
-      deleteNotification: () => {},
     }),
     {
       name: "myPetPlant-notification-storage",
@@ -89,34 +103,20 @@ export const useNotificationStore = create(
 );
 
 async function handleDeleteNotification(
-  notifications: notificationType,
-  plantId: string,
-  nextWateredAtTimestamp: number
-) {}
-
-async function handleEditNotifications(
   notifications: notificationType[],
   plantId: string,
-  prevNextWateredTimestamp: number,
-  currentNextWateredTimestamp: number,
-  timeOfDay: timeOfDayType
+  nextWateredAtTimestamp: number
 ) {
-  if (isSameDay(prevNextWateredTimestamp, currentNextWateredTimestamp)) {
-    return notifications;
-  }
   let updatedNotifications: notificationType[] = [];
-  let addedToExistingNotification = false;
   let now: number = Date.now();
   for (let i = 0; i < notifications.length; i++) {
     let notification = notifications[i];
-    //remove old notifications
     if (notification.triggerTimestamp < now) {
       continue;
     }
-    //modify previous notification
-    if (isSameDay(prevNextWateredTimestamp, notification.triggerTimestamp)) {
+    if (isSameDay(notification.triggerTimestamp, nextWateredAtTimestamp)) {
       if (notification.plantIds.includes(plantId)) {
-        //previous notification date linked to this plant only -> cancel notification and remove from notifications array
+        //notification date linked to this plant only -> cancel notification and remove entire notification
         if (notification.plantIds.length === 1) {
           await Notifications.cancelScheduledNotificationAsync(notification.id);
           continue;
@@ -132,42 +132,102 @@ async function handleEditNotifications(
       } else {
         updatedNotifications.push(notification);
       }
-      continue;
-    }
-    //add current notification: notification for this date already exists -> add to existing notification's plantIds
-    if (isSameDay(currentNextWateredTimestamp, notification.triggerTimestamp)) {
-      let newNotification = notification;
-      if (!notification.plantIds.includes(plantId)) {
-        const newPlantIds = [...notification.plantIds, plantId];
-        newNotification = { ...newNotification, plantIds: newPlantIds };
-      }
-      updatedNotifications.push(newNotification);
-      addedToExistingNotification = true;
     } else {
       updatedNotifications.push(notification);
     }
   }
-  //add current notification: notification for this date doesn't exist -> schedule new notification and add to list
-  if (!addedToExistingNotification) {
-    const triggerDate = set(new Date(currentNextWateredTimestamp), {
-      hours: timeOfDay.hours,
-      minutes: timeOfDay.minutes,
-    });
-    const triggerTimestamp = triggerDate.getTime();
-    const pushNotificationId = await scheduleNotification(triggerDate);
-    if (!pushNotificationId) {
-      console.error("Unable to create notification");
-      return updatedNotifications;
-    }
-    const newNotification: notificationType = {
-      id: pushNotificationId,
-      plantIds: [plantId],
-      triggerTimestamp,
-    };
-    updatedNotifications.push(newNotification);
-  }
   console.log(updatedNotifications);
   return updatedNotifications;
+}
+
+async function handleEditNotifications(
+  notifications: notificationType[],
+  plantId: string,
+  prevNextWateredTimestamp: number,
+  currentNextWateredTimestamp: number,
+  timeOfDay: timeOfDayType
+) {
+  if (isSameDay(prevNextWateredTimestamp, currentNextWateredTimestamp)) {
+    return notifications;
+  }
+  let updatedNotifications = await handleDeleteNotification(
+    notifications,
+    plantId,
+    prevNextWateredTimestamp
+  );
+  updatedNotifications = await handleAddNotification(
+    updatedNotifications,
+    currentNextWateredTimestamp,
+    plantId,
+    timeOfDay
+  );
+  return updatedNotifications;
+
+  //let updatedNotifications: notificationType[] = [];
+
+  // let addedToExistingNotification = false;
+  // let now: number = Date.now();
+  // for (let i = 0; i < notifications.length; i++) {
+  //   let notification = notifications[i];
+  //   //remove old notifications
+  //   if (notification.triggerTimestamp < now) {
+  //     continue;
+  //   }
+  //   //modify previous notification
+  //   if (isSameDay(prevNextWateredTimestamp, notification.triggerTimestamp)) {
+  //     if (notification.plantIds.includes(plantId)) {
+  //       //previous notification date linked to this plant only -> cancel notification and remove from notifications array
+  //       if (notification.plantIds.length === 1) {
+  //         await Notifications.cancelScheduledNotificationAsync(notification.id);
+  //         continue;
+  //       }
+  //       //previous notification date shared with other plants -> remove this plant from plantId array
+  //       const updatedPlantIds = notification.plantIds.filter(
+  //         (id) => id !== plantId
+  //       );
+  //       updatedNotifications.push({
+  //         ...notification,
+  //         plantIds: updatedPlantIds,
+  //       });
+  //     } else {
+  //       updatedNotifications.push(notification);
+  //     }
+  //     continue;
+  //   }
+  //   //add current notification: notification for this date already exists -> add to existing notification's plantIds
+  //   if (isSameDay(currentNextWateredTimestamp, notification.triggerTimestamp)) {
+  //     let newNotification = notification;
+  //     if (!notification.plantIds.includes(plantId)) {
+  //       const newPlantIds = [...notification.plantIds, plantId];
+  //       newNotification = { ...newNotification, plantIds: newPlantIds };
+  //     }
+  //     updatedNotifications.push(newNotification);
+  //     addedToExistingNotification = true;
+  //   } else {
+  //     updatedNotifications.push(notification);
+  //   }
+  // }
+  // //add current notification: notification for this date doesn't exist -> schedule new notification and add to list
+  // if (!addedToExistingNotification) {
+  //   const triggerDate = set(new Date(currentNextWateredTimestamp), {
+  //     hours: timeOfDay.hours,
+  //     minutes: timeOfDay.minutes,
+  //   });
+  //   const triggerTimestamp = triggerDate.getTime();
+  //   const pushNotificationId = await scheduleNotification(triggerDate);
+  //   if (!pushNotificationId) {
+  //     console.error("Unable to create notification");
+  //     return updatedNotifications;
+  //   }
+  //   const newNotification: notificationType = {
+  //     id: pushNotificationId,
+  //     plantIds: [plantId],
+  //     triggerTimestamp,
+  //   };
+  //   updatedNotifications.push(newNotification);
+  // }
+  // console.log(updatedNotifications);
+  // return updatedNotifications;
 }
 
 async function handleAddNotification(
