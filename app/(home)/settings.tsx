@@ -1,8 +1,21 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, Pressable, Alert } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  Alert,
+  TextInput,
+} from "react-native";
 import { useUserStore } from "../../store/userStore";
 import { useRouter } from "expo-router";
 import { useNotificationStore } from "@/store/notificationStore";
+import { theme } from "@/themes";
+import { useState } from "react";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import { format, set } from "date-fns";
 
 export default function Settings() {
   const router = useRouter();
@@ -10,10 +23,36 @@ export default function Settings() {
   const resetNotifications = useNotificationStore(
     (state) => state.resetNotifications
   );
+  const isNotificationOn = useNotificationStore(
+    (state) => state.isNotificationOn
+  );
+  const toggleIsNotificationOn = useNotificationStore(
+    (state) => state.toggleIsNotificatinoOn
+  );
+  const timeOfDay = useNotificationStore((state) => state.timeOfDay);
+  const changeTimeOfDay = useNotificationStore(
+    (state) => state.changeTimeOfDay
+  );
+  const [time, setTime] = useState<Date>(
+    set(new Date(), { hours: timeOfDay.hours, minutes: timeOfDay.minutes })
+  );
+  const [timePickerVisible, setTimePickerVisible] = useState<boolean>(false);
 
   const handlePress = () => {
     toggleHasOnboarded();
     router.replace("/onboarding");
+  };
+
+  const handleNotificationTime = () => {
+    setTimePickerVisible(true);
+  };
+
+  const onChangeTime = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    setTimePickerVisible(false);
+    if (selectedDate) {
+      setTime(selectedDate);
+      changeTimeOfDay(selectedDate);
+    }
   };
 
   const handleResetNotification = () => {
@@ -34,7 +73,35 @@ export default function Settings() {
 
   return (
     <View style={styles.container}>
-      <Text>Settings</Text>
+      <View>
+        <View style={styles.row}>
+          <Text>Notifications </Text>
+          <Pressable
+            style={styles.notificationButton}
+            onPress={toggleIsNotificationOn}
+          >
+            <Text style={styles.NotificationText}>
+              {isNotificationOn ? "On" : "Off"}
+            </Text>
+          </Pressable>
+        </View>
+        <View style={styles.row}>
+          <Text>Notification Time</Text>
+          <Pressable
+            style={styles.notificationButton}
+            onPress={handleNotificationTime}
+          >
+            <Text style={styles.NotificationText}>{`${format(
+              time,
+              "hh"
+            )}:${format(time, "mm aaa")}`}</Text>
+          </Pressable>
+        </View>
+      </View>
+      {timePickerVisible ? (
+        <DateTimePicker value={time} mode="time" onChange={onChangeTime} />
+      ) : undefined}
+
       <Pressable onPress={handlePress}>
         <Text>back to Onboarding</Text>
       </Pressable>
@@ -52,5 +119,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  notificationButton: {
+    width: 120,
+    borderWidth: 2,
+    borderColor: theme.colorLightGrey,
+    borderRadius: 6,
+    padding: 4,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "80%",
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  NotificationText: {
+    textAlign: "center",
   },
 });

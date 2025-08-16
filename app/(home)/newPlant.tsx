@@ -1,25 +1,18 @@
 import { useState } from "react";
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-  Text,
-  Alert,
-  TextInput,
-} from "react-native";
+import { ScrollView, StyleSheet, View, Alert } from "react-native";
 import uuid from "react-native-uuid";
 import PlantImagePicker from "../components/PlantImagePicker";
 import * as ImagePicker from "expo-image-picker";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import PlantActionButton from "../components/PlantActionButton";
-import { theme } from "@/themes";
 import { PlantType, usePlantStore } from "@/store/plantStore";
 import { useRouter } from "expo-router";
 import { useNotificationStore } from "@/store/notificationStore";
+import NameInput from "../components/NameInput";
+import FrequencyInput from "../components/FrequencyInput";
+import DateInput from "../components/DateInput";
 
 export default function NewPlant() {
   const addPlant = usePlantStore((store) => store.addPlant);
@@ -150,47 +143,12 @@ export default function NewPlant() {
         onPressCamera={handleUseCamera}
       />
       <View style={styles.inputContainer}>
-        <View style={styles.inputRow}>
-          <Ionicons
-            name={plantName ? "leaf" : "leaf-outline"}
-            size={24}
-            color={theme.colorGreen}
-          />
-          <TextInput
-            style={[styles.nameInput, styles.text]}
-            placeholder="Name"
-            value={plantName}
-            onChangeText={setPlantName}
-            autoCapitalize="words"
-          ></TextInput>
-        </View>
-        <View style={styles.inputRow}>
-          <Ionicons
-            name={frequencyDays ? "leaf" : "leaf-outline"}
-            size={24}
-            color={theme.colorGreen}
-          />
-          <Text style={styles.text}>Water every</Text>
-          <TextInput
-            style={[styles.daysInput, styles.text]}
-            keyboardType="number-pad"
-            onChangeText={setFrequenceDays}
-          ></TextInput>
-          <Text style={styles.text}>days</Text>
-        </View>
-        <View style={styles.inputRow}>
-          <Ionicons
-            name={date ? "leaf" : "leaf-outline"}
-            size={24}
-            color={theme.colorGreen}
-          />
-          <Text style={styles.text}>Starting on</Text>
-          <Pressable style={styles.dateButton} onPress={openDatePicker}>
-            <Text style={[styles.text, styles.dateText]}>
-              {date ? date.toLocaleDateString() : "Select Date"}
-            </Text>
-          </Pressable>
-        </View>
+        <NameInput plantName={plantName} onChangeText={setPlantName} />
+        <FrequencyInput
+          frequencyDays={frequencyDays}
+          onChangeText={setFrequenceDays}
+        />
+        <DateInput date={date} onPress={openDatePicker} type="add" />
       </View>
       <PlantActionButton title="Add Plant" onPress={handleAddPlant} />
       {datePickerVisible ? (
@@ -221,37 +179,6 @@ const styles = StyleSheet.create({
   inputContainer: {
     alignItems: "flex-start",
     justifyContent: "space-between",
-    paddingBottom: 20,
-  },
-  inputRow: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    gap: "12",
-    paddingVertical: 10,
-  },
-  nameInput: {
-    borderWidth: 2,
-    borderRadius: 6,
-    width: 220,
-    borderColor: theme.colorLightGrey,
-  },
-  daysInput: {
-    borderWidth: 2,
-    borderRadius: 6,
-    width: 50,
-    borderColor: theme.colorLightGrey,
-    textAlign: "center",
-  },
-  text: {
-    fontSize: 16,
-  },
-  dateButton: {
-    paddingVertical: 10,
-  },
-  dateText: {
-    textDecorationLine: "underline",
-    fontWeight: "bold",
-    color: theme.colorDarkGreen,
+    paddingBottom: 30,
   },
 });

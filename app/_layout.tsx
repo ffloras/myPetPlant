@@ -1,3 +1,4 @@
+import { theme } from "@/themes";
 import { Stack } from "expo-router";
 
 export default function Layout() {
@@ -6,7 +7,17 @@ export default function Layout() {
       <Stack.Screen name="(home)" options={{ headerShown: false }} />
       <Stack.Screen
         name="onboarding"
-        options={{ headerShown: false, animation: "fade" }}
+        options={{
+          headerShown: false,
+          animation: "fade",
+        }}
+      />
+      <Stack.Screen
+        name="onboarding2"
+        options={{
+          headerShown: false,
+          animation: "fade",
+        }}
       />
     </Stack>
   );

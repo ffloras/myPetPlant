@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View, Image } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useUserStore } from "../store/userStore";
 import { useRouter } from "expo-router";
 import PlantImage from "./components/PlantImage";
@@ -10,7 +10,8 @@ export default function Onboarding() {
   const toggleHasOnboarded = useUserStore((state) => state.toggleHasOnboarded);
 
   const handlePress = () => {
-    router.replace("/onboarding2");
+    toggleHasOnboarded();
+    router.replace("/");
   };
 
   return (
@@ -18,16 +19,24 @@ export default function Onboarding() {
       <Text style={[styles.text, styles.headingText]}>My Pet Plant</Text>
 
       <OnboardingImage
-        name="onboarding1Main"
+        name="onboarding2Main"
         imgWidth={1024}
         imgHeight={1024}
       />
       <Text style={[styles.text, styles.descriptionText]}>
-        Keep track of your plants' watering schedule
+        Recieve notifications when your plants need watering
       </Text>
-      <OnboardingImage name="calendarImg" imgWidth={1024} imgHeight={250} />
-      <View style={styles.spacer48}></View>
-      <OnboardingImage name="arrow" imgWidth={150} imgHeight={120} size={50} />
+      <OnboardingImage name="notifications" imgWidth={1024} imgHeight={250} />
+      <View style={styles.spacer44}></View>
+      <View style={styles.startButton}>
+        <Text style={[styles.text, styles.subheadingText]}>Start</Text>
+        <OnboardingImage
+          name="arrow"
+          imgWidth={150}
+          imgHeight={120}
+          size={40}
+        />
+      </View>
     </Pressable>
   );
 }
@@ -50,17 +59,23 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   subheadingText: {
-    fontSize: 20,
+    fontSize: 26,
     fontWeight: "bold",
+    paddingHorizontal: 4,
   },
   descriptionText: {
     fontSize: 18,
     width: "90%",
-    paddingTop: 10,
-    paddingBottom: 8,
+    paddingTop: 6,
+    paddingBottom: 4,
     fontWeight: "bold",
   },
-  spacer48: {
-    height: 48,
+  startButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  spacer44: {
+    height: 44,
   },
 });

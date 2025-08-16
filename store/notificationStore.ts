@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { isSameDay, set } from "date-fns";
+import { getHours, getMinutes, isSameDay, set } from "date-fns";
 import { registerForPushNotificationsAsync } from "@/utils/registerForPushNotificationsAsync";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
@@ -13,14 +13,16 @@ type timeOfDayType = {
 };
 
 type notificationType = {
-  id: string;
+  id?: string;
   plantIds: string[];
   triggerTimestamp: number;
 };
 
 type notificationStoreType = {
   notifications: notificationType[];
+  isNotificationOn: boolean;
   timeOfDay: timeOfDayType;
+  changeTimeOfDay: (newDateTime: Date) => void;
   addNotification: (plantId: string, nextWateredAtTimestamp: number) => void;
   updateNotifications: (
     plantId: string,
@@ -29,13 +31,24 @@ type notificationStoreType = {
   ) => void;
   resetNotifications: () => void;
   deleteNotification: (plantId: string, nextWateredAtTimestamp: number) => void;
+  toggleIsNotificatinoOn: () => void;
 };
 
 export const useNotificationStore = create(
   persist<notificationStoreType>(
     (set) => ({
       notifications: [],
+      isNotificationOn: true,
       timeOfDay: { hours: 7, minutes: 0 },
+      changeTimeOfDay: async (newDateTime: Date) => {
+        const newHour = getHours(newDateTime);
+        const newMinutes = getMinutes(newDateTime);
+        const notifications = useNotificationStore.getState().notifications;
+        set((state) => ({
+          ...state,
+          timeOfDay: { hours: newHour, minutes: newMinutes },
+        }));
+      },
       addNotification: async (
         plantId: string,
         nextWateredAtTimestamp: number
@@ -94,6 +107,24 @@ export const useNotificationStore = create(
           notifications: [],
         }));
       },
+      toggleIsNotificatinoOn: async () => {
+        const notifications = useNotificationStore.getState().notifications;
+        let updatedNotifications: notificationType[];
+        if (useNotificationStore.getState().isNotificationOn) {
+          updatedNotifications = await handleTurnNotificationsOff(
+            notifications
+          );
+          console.log(updatedNotifications);
+        } else {
+          updatedNotifications = await handleTurnNotificationsOn(notifications);
+          console.log(updatedNotifications);
+        }
+        set((state) => ({
+          ...state,
+          isNotificationOn: !state.isNotificationOn,
+          notifications: updatedNotifications,
+        }));
+      },
     }),
     {
       name: "myPetPlant-notification-storage",
@@ -101,6 +132,49 @@ export const useNotificationStore = create(
     }
   )
 );
+
+async function handleChangeNotificationTime(
+  notifications: notificationType[],
+  timeOfDay: timeOfDayType
+) {
+  //cancel all notifications
+  //filter out old notifications
+  //add new notifications using new time of day, overwrite old notification id
+}
+
+async function handleTurnNotificationsOff(
+  notifications: notificationType[]
+): Promise<notificationType[]> {
+  await Notifications.cancelAllScheduledNotificationsAsync();
+  return notifications.map((notification) => ({
+    ...notification,
+    id: undefined,
+  }));
+}
+
+async function handleTurnNotificationsOn(
+  notifications: notificationType[]
+): Promise<notificationType[]> {
+  const filteredNotifications = notifications.filter(
+    (notification) => notification.triggerTimestamp > Date.now()
+  );
+  try {
+    return Promise.all(
+      filteredNotifications.map(async (notification) => {
+        const newNotificationId = await scheduleNotification(
+          new Date(notification.triggerTimestamp)
+        );
+        return {
+          ...notification,
+          id: newNotificationId,
+        };
+      })
+    );
+  } catch {
+    console.log("Error: unable to reschedule notifications");
+    return filteredNotifications;
+  }
+}
 
 async function handleDeleteNotification(
   notifications: notificationType[],
@@ -117,9 +191,16 @@ async function handleDeleteNotification(
     if (isSameDay(notification.triggerTimestamp, nextWateredAtTimestamp)) {
       if (notification.plantIds.includes(plantId)) {
         //notification date linked to this plant only -> cancel notification and remove entire notification
-        if (notification.plantIds.length === 1) {
-          await Notifications.cancelScheduledNotificationAsync(notification.id);
-          continue;
+        if (notification.plantIds.length === 1 && notification.id) {
+          try {
+            await Notifications.cancelScheduledNotificationAsync(
+              notification.id
+            );
+            continue;
+          } catch {
+            console.log(`Error deleting notification id: ${notification.id}`);
+            continue;
+          }
         }
         //previous notification date shared with other plants -> remove this plant from plantId array
         const updatedPlantIds = notification.plantIds.filter(
@@ -150,17 +231,24 @@ async function handleEditNotifications(
   if (isSameDay(prevNextWateredTimestamp, currentNextWateredTimestamp)) {
     return notifications;
   }
-  let updatedNotifications = await handleDeleteNotification(
-    notifications,
-    plantId,
-    prevNextWateredTimestamp
-  );
-  updatedNotifications = await handleAddNotification(
-    updatedNotifications,
-    currentNextWateredTimestamp,
-    plantId,
-    timeOfDay
-  );
+  let updatedNotifications;
+  try {
+    updatedNotifications = await handleDeleteNotification(
+      notifications,
+      plantId,
+      prevNextWateredTimestamp
+    );
+    updatedNotifications = await handleAddNotification(
+      updatedNotifications,
+      currentNextWateredTimestamp,
+      plantId,
+      timeOfDay
+    );
+  } catch {
+    console.log("Error updating notification");
+    updatedNotifications = notifications;
+  }
+
   return updatedNotifications;
 
   //let updatedNotifications: notificationType[] = [];
@@ -262,8 +350,10 @@ async function handleAddNotification(
       minutes: timeOfDay.minutes,
     });
     const triggerTimestamp = triggerDate.getTime();
-    const pushNotificationId = await scheduleNotification(triggerDate);
-    if (!pushNotificationId) {
+    let pushNotificationId;
+    try {
+      pushNotificationId = await scheduleNotification(triggerDate);
+    } catch {
       console.error("Unable to create notification");
       return updatedNotifications;
     }

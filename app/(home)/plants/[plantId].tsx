@@ -1,17 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-  Text,
-  Alert,
-  TextInput,
-} from "react-native";
-import uuid from "react-native-uuid";
+import { ScrollView, StyleSheet, View, Text, Alert } from "react-native";
 import PlantImagePicker from "@/app/components/PlantImagePicker";
 import * as ImagePicker from "expo-image-picker";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
@@ -19,17 +9,23 @@ import PlantActionButton from "@/app/components/PlantActionButton";
 import { theme } from "@/themes";
 import { PlantType, usePlantStore } from "@/store/plantStore";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { format } from "date-fns";
 import { useNotificationStore } from "@/store/notificationStore";
+import NameInput from "@/app/components/NameInput";
+import FrequencyInput from "@/app/components/FrequencyInput";
+import DateInput from "@/app/components/DateInput";
+import LastWateredInput from "@/app/components/LastWateredInput";
 
 export default function PlantEdit() {
+  const router = useRouter();
+  const navigation = useNavigation();
+
   const plantId = useLocalSearchParams().plantId;
   const plant = usePlantStore((store) =>
     store.plants.find((plant) => plant.id === plantId)
   );
-  const prevNextWaterAtTimestamp = plant?.nextWateredAtTimestamp;
   const editPlant = usePlantStore((store) => store.editPlant);
   const removePlant = usePlantStore((store) => store.removePlant);
+
   const updateNotification = useNotificationStore(
     (store) => store.updateNotifications
   );
@@ -40,23 +36,18 @@ export default function PlantEdit() {
   const [cameraStatus, requestCameraPermission] =
     ImagePicker.useCameraPermissions();
   const [imageUri, setImageUri] = useState<string | undefined>(plant?.imageUri);
-  const [plantName, setPlantName] = useState<string>(plant?.name ?? "");
+  const [plantName, setPlantName] = useState<string | undefined>(plant?.name);
   const [frequencyDays, setFrequenceDays] = useState<string | undefined>(
     plant?.wateringFrequencyDays.toString()
   );
   const [date, setDate] = useState<Date | undefined>(
     plant ? new Date(plant.nextWateredAtTimestamp) : undefined
   );
+  const [datePickerVisible, setDatePickerVisible] = useState<boolean>(false);
   const [lastWatered, setLastWatered] = useState<number | undefined>(
     plant ? plant.lastWateredAtTimestamp : undefined
   );
-  const [prevLastWatered, setPrevLastWatered] = useState<number | undefined>(
-    plant ? plant.prevLastWateredAtTimestamp : undefined
-  );
-  const [datePickerVisible, setDatePickerVisible] = useState<boolean>(false);
-
-  const router = useRouter();
-  const navigation = useNavigation();
+  let prevLastWatered: number | undefined = plant?.prevLastWateredAtTimestamp;
 
   useEffect(() => {
     navigation.setOptions({
@@ -162,7 +153,7 @@ export default function PlantEdit() {
       imageUri: imageUri,
     };
 
-    editPlant(editedPlant);
+    const prevNextWaterAtTimestamp = plant?.nextWateredAtTimestamp;
     if (prevNextWaterAtTimestamp && editedPlant.nextWateredAtTimestamp) {
       updateNotification(
         editedPlant.id,
@@ -170,31 +161,13 @@ export default function PlantEdit() {
         editedPlant.nextWateredAtTimestamp
       );
     }
+    editPlant(editedPlant);
     router.back();
   };
 
-  const handleRevertLastWateredDate = () => {
+  const handleLastWateredDate = () => {
     if (!lastWatered) {
       return;
-    }
-    if (!prevLastWatered) {
-      return Alert.alert(
-        "Remove last watered date?",
-        "Last watered date will be permanently removed upon saving",
-        [
-          {
-            text: "Yes",
-            onPress: () => {
-              setLastWatered(undefined);
-            },
-            style: "destructive",
-          },
-          {
-            text: "Cancel",
-            style: "cancel",
-          },
-        ]
-      );
     }
     return Alert.alert(
       "Revert to previous last watered date?",
@@ -204,7 +177,7 @@ export default function PlantEdit() {
           text: "Yes",
           onPress: () => {
             setLastWatered(prevLastWatered);
-            setPrevLastWatered(undefined);
+            prevLastWatered = undefined;
           },
           style: "destructive",
         },
@@ -220,7 +193,6 @@ export default function PlantEdit() {
     if (!plant?.id) {
       return;
     }
-
     Alert.alert("Delete plant?", "This plant will be permanently removed", [
       {
         text: "Yes",
@@ -258,64 +230,16 @@ export default function PlantEdit() {
         onPressCamera={handleUseCamera}
       />
       <View style={styles.inputContainer}>
-        <View style={styles.inputRow}>
-          <Ionicons
-            name={plantName ? "leaf" : "leaf-outline"}
-            size={24}
-            color={theme.colorGreen}
-          />
-          <TextInput
-            style={[styles.nameInput, styles.text]}
-            placeholder="Name"
-            value={plantName}
-            onChangeText={setPlantName}
-            autoCapitalize="words"
-          ></TextInput>
-        </View>
-        <View style={styles.inputRow}>
-          <Ionicons
-            name={frequencyDays ? "leaf" : "leaf-outline"}
-            size={24}
-            color={theme.colorGreen}
-          />
-          <Text style={styles.text}>Water every</Text>
-          <TextInput
-            value={frequencyDays}
-            style={[styles.daysInput, styles.text]}
-            keyboardType="number-pad"
-            onChangeText={setFrequenceDays}
-          ></TextInput>
-          <Text style={styles.text}>days</Text>
-        </View>
-        <View style={styles.inputRow}>
-          <Ionicons
-            name={date ? "leaf" : "leaf-outline"}
-            size={24}
-            color={theme.colorGreen}
-          />
-          <Text style={styles.text}>Water on</Text>
-          <Pressable style={styles.dateButton} onPress={openDatePicker}>
-            <Text style={[styles.text, styles.dateText]}>
-              {date ? format(date, "eee MMM d") : "Select Date"}
-            </Text>
-          </Pressable>
-        </View>
-        <View style={styles.inputRow}>
-          <Ionicons
-            name={date ? "leaf" : "leaf-outline"}
-            size={24}
-            color={theme.colorGreen}
-          />
-          <Text style={styles.text}>Last Watered</Text>
-          <Pressable
-            style={styles.dateButton}
-            onPress={handleRevertLastWateredDate}
-          >
-            <Text style={[styles.text, styles.dateText]}>
-              {lastWatered ? format(lastWatered, "eee MMM d") : "N/A"}
-            </Text>
-          </Pressable>
-        </View>
+        <NameInput plantName={plantName} onChangeText={setPlantName} />
+        <FrequencyInput
+          frequencyDays={frequencyDays}
+          onChangeText={setFrequenceDays}
+        />
+        <DateInput date={date} onPress={openDatePicker} type="edit" />
+        <LastWateredInput
+          lastWatered={lastWatered}
+          onPress={handleLastWateredDate}
+        />
       </View>
       <PlantActionButton title="Save" onPress={handleEditPlant} />
       <View style={styles.spacer}></View>
@@ -360,36 +284,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingBottom: 20,
   },
-  inputRow: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    gap: "12",
-    paddingVertical: 10,
-  },
-  nameInput: {
-    borderWidth: 2,
-    borderRadius: 6,
-    width: 220,
-    borderColor: theme.colorLightGrey,
-  },
-  daysInput: {
-    borderWidth: 2,
-    borderRadius: 6,
-    width: 50,
-    borderColor: theme.colorLightGrey,
-    textAlign: "center",
-  },
   text: {
     fontSize: 16,
-  },
-  dateButton: {
-    paddingVertical: 10,
-  },
-  dateText: {
-    textDecorationLine: "underline",
-    fontWeight: "bold",
-    color: theme.colorDarkGreen,
   },
   spacer: {
     height: 5,

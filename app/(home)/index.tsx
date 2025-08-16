@@ -9,6 +9,10 @@ import { useSearchStore } from "@/store/searchStore";
 import { useEffect, useRef, useState } from "react";
 import SearchBar from "../components/SearchBar";
 import { theme } from "@/themes";
+import ListEmpty from "../components/ListEmpty";
+import * as SystemUI from "expo-system-ui";
+
+SystemUI.setBackgroundColorAsync(theme.colorPaleGreen);
 
 const dummyPlant: PlantType = {
   id: "1234",
@@ -25,6 +29,7 @@ export default function App() {
   const searchOpened = useSearchStore((store) => store.searchOpened);
   const [plantsList, setPlantsList] = useState<PlantType[]>(plants);
   const [searchText, setSearchText] = useState<string>();
+  const router = useRouter();
   // const flatListRef = useRef<FlatList<PlantType>>(null);
 
   //reset search bar and plant cards when opening/closing search bar
@@ -77,7 +82,9 @@ export default function App() {
       ListEmptyComponent={
         searchOpened && searchText ? (
           <Text style={styles.noPlantsFoundText}>No plants found</Text>
-        ) : undefined
+        ) : (
+          <ListEmpty />
+        )
       }
     />
   );

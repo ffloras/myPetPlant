@@ -3479,6 +3479,14 @@ expo-status-bar@~2.2.3:
     react-native-edge-to-edge "1.6.0"
     react-native-is-edge-to-edge "^1.1.6"
 
+expo-system-ui@~5.0.10:
+  version "5.0.10"
+  resolved "https://registry.yarnpkg.com/expo-system-ui/-/expo-system-ui-5.0.10.tgz#74b14aff7e6b3d127221709f38516593d2868e78"
+  integrity sha512-BTXbSyJr80yuN6VO4XQKZj7BjesZQLHgOYZ0bWyf4VB19GFZq7ZnZOEc/eoKk1B3eIocOMKUfNCrg/Wn8Kfcuw==
+  dependencies:
+    "@react-native/normalize-colors" "0.79.5"
+    debug "^4.3.2"
+
 expo@~53.0.20:
   version "53.0.20"
   resolved "https://registry.yarnpkg.com/expo/-/expo-53.0.20.tgz#e11b553322de313d47c407367d8d48d3a073e3cc"
