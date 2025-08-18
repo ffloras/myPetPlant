@@ -45,12 +45,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    gap: "12",
+    gap: 12,
     paddingVertical: 10,
   },
   text: {
     fontSize: 16,
     fontWeight: "600",
+    color: theme.colorBlack,
   },
   dateButton: {
     paddingVertical: 10,
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
     width: 155,
   },
   dateText: {
-    color: theme.colorMidGrey,
+    color: theme.colorGrey,
     textAlign: "center",
     fontWeight: "600",
   },

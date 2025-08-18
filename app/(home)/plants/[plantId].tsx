@@ -289,6 +289,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   spacer: {
-    height: 5,
+    height: 6,
   },
 });

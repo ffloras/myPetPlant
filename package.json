@@ -16,7 +16,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react-native": "^5.0.0",
-    "expo": "~53.0.20",
+    "expo": "^53.0.20",
     "expo-constants": "~17.1.7",
     "expo-dev-client": "~5.2.4",
     "expo-device": "~7.1.4",

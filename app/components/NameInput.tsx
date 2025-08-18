@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    gap: "12",
+    gap: 12,
     paddingVertical: 10,
   },
   nameInput: {
@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
     width: 250,
     borderColor: theme.colorLightGrey,
     fontWeight: "600",
+    paddingLeft: 8,
   },
   text: {
     fontSize: 16,

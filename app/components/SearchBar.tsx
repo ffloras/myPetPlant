@@ -39,5 +39,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colorWhite,
     width: "100%",
     borderRadius: 6,
+    paddingLeft: 8,
   },
 });

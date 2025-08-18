@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    gap: "12",
+    gap: 12,
     paddingVertical: 10,
   },
   frequencyInput: {
@@ -50,5 +50,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     fontWeight: "600",
+    color: theme.colorBlack,
   },
 });
