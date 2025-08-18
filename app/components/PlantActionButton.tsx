@@ -9,6 +9,7 @@ type PlantActionButtonType = {
   buttonWidth?: number;
   color?: [ColorValue, ColorValue, ...ColorValue[]];
   icon?: "check";
+  darkMode?: boolean;
 };
 
 export default function PlantActionButton({
@@ -17,6 +18,7 @@ export default function PlantActionButton({
   buttonWidth,
   color,
   icon,
+  darkMode,
 }: PlantActionButtonType) {
   return (
     <LinearGradient
@@ -37,7 +39,11 @@ export default function PlantActionButton({
         {icon ? (
           <FontAwesome name={icon} size={24} color={theme.colorWhite} />
         ) : undefined}
-        {title ? <Text style={styles.text}>{title}</Text> : undefined}
+        {title ? (
+          <Text style={[styles.text, darkMode ? styles.textDark : undefined]}>
+            {title}
+          </Text>
+        ) : undefined}
       </Pressable>
     </LinearGradient>
   );
@@ -52,9 +58,12 @@ const styles = StyleSheet.create({
   },
   text: {
     color: theme.colorWhite,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  textDark: {
+    color: theme.colorGrey,
   },
   button: {
     borderRadius: 6,

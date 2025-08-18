@@ -12,7 +12,7 @@ export default function HeaderIcon({ icon, onPress }: HeaderIconType) {
     <Pressable hitSlop={20}>
       <AntDesign
         name={icon}
-        size={24}
+        size={28}
         color={theme.colorGreen}
         onPress={onPress}
       />

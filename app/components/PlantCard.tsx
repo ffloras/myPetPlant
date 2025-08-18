@@ -89,7 +89,7 @@ export default function PlantCard({ plant }: { plant: PlantType }) {
       </View>
       <Link href={`plants/${plant.id}`} asChild>
         <Pressable style={styles.bodyContainer}>
-          <PlantImage imageUri={plant.imageUri} size={120} />
+          <PlantImage imageUri={plant.imageUri} size={140} />
           <View style={styles.infoContainer}>
             <Text style={styles.nameText} numberOfLines={1}>
               {plant.name}
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   container: {
     borderWidth: 2,
     borderRadius: 6,
-    marginVertical: 10,
+    marginTop: 12,
     backgroundColor: theme.colorWhite,
     shadowColor: theme.colorBlack,
     elevation: 3,
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   infoContainer: {
-    paddingLeft: 10,
+    paddingHorizontal: 12,
     justifyContent: "center",
     flexWrap: "wrap",
     flex: 1,

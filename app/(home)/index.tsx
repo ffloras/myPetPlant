@@ -62,6 +62,7 @@ export default function App() {
   return (
     <AnimatedFlatList
       data={sortPlantsByDate(plantsList)}
+      // data={[]}
       // ref={flatListRef}
       style={styles.container}
       contentContainerStyle={styles.contentContainer}

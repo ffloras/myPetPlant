@@ -38,10 +38,12 @@ const styles = StyleSheet.create({
   nameInput: {
     borderWidth: 2,
     borderRadius: 6,
-    width: 220,
+    width: 250,
     borderColor: theme.colorLightGrey,
+    fontWeight: "600",
   },
   text: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

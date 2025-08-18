@@ -44,9 +44,14 @@ export const useNotificationStore = create(
         const newHour = getHours(newDateTime);
         const newMinutes = getMinutes(newDateTime);
         const notifications = useNotificationStore.getState().notifications;
+        const updatedNotifications = await handleChangeNotificationTime(
+          notifications,
+          { hours: newHour, minutes: newMinutes }
+        );
         set((state) => ({
           ...state,
           timeOfDay: { hours: newHour, minutes: newMinutes },
+          notifications: updatedNotifications,
         }));
       },
       addNotification: async (
@@ -135,17 +140,59 @@ export const useNotificationStore = create(
 
 async function handleChangeNotificationTime(
   notifications: notificationType[],
-  timeOfDay: timeOfDayType
+  newTimeOfDay: timeOfDayType
 ) {
   //cancel all notifications
-  //filter out old notifications
-  //add new notifications using new time of day, overwrite old notification id
+  try {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+  } catch {
+    Alert.alert("Error", "Unable to reschedule notifications");
+    return notifications;
+  }
+  let updatedNotifications = [];
+  for (let i = 0; i < notifications.length; i++) {
+    let notification = notifications[i];
+    let newNotification;
+    //filter out old notifications
+    if (notification.triggerTimestamp < Date.now()) {
+      continue;
+    }
+    //add new notifications using new time of day
+    let newTriggerDate = set(new Date(notification.triggerTimestamp), {
+      hours: newTimeOfDay.hours,
+      minutes: newTimeOfDay.minutes,
+    });
+    let newTriggerTimestamp = newTriggerDate.getTime();
+    //overwrite old notification id
+    try {
+      let newPushNotificationId = await scheduleNotification(newTriggerDate);
+      newNotification = {
+        ...notification,
+        id: newPushNotificationId,
+        triggerTimestamp: newTriggerTimestamp,
+      };
+    } catch {
+      Alert.alert(
+        "Error",
+        `Unable to reschedule notifications for the date: ${newTriggerDate.toLocaleDateString()}`
+      );
+      continue;
+    }
+    updatedNotifications.push(newNotification);
+  }
+  console.log(updatedNotifications);
+  return updatedNotifications;
 }
 
 async function handleTurnNotificationsOff(
   notifications: notificationType[]
 ): Promise<notificationType[]> {
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  try {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+  } catch {
+    Alert.alert("Error", "Unable to turn off notifications");
+    return notifications;
+  }
   return notifications.map((notification) => ({
     ...notification,
     id: undefined,
@@ -185,12 +232,13 @@ async function handleDeleteNotification(
   let now: number = Date.now();
   for (let i = 0; i < notifications.length; i++) {
     let notification = notifications[i];
+    //remove old notifications
     if (notification.triggerTimestamp < now) {
       continue;
     }
     if (isSameDay(notification.triggerTimestamp, nextWateredAtTimestamp)) {
       if (notification.plantIds.includes(plantId)) {
-        //notification date linked to this plant only -> cancel notification and remove entire notification
+        //notification date linked to this plant only -> cancel and remove notification
         if (notification.plantIds.length === 1 && notification.id) {
           try {
             await Notifications.cancelScheduledNotificationAsync(
@@ -198,11 +246,18 @@ async function handleDeleteNotification(
             );
             continue;
           } catch {
-            console.log(`Error deleting notification id: ${notification.id}`);
+            Alert.alert(
+              "Oops something went wrong",
+              `Unable to remove notification id: ${
+                notification.id
+              } scheduled on ${new Date(
+                notification.triggerTimestamp
+              ).toLocaleDateString()}`
+            );
             continue;
           }
         }
-        //previous notification date shared with other plants -> remove this plant from plantId array
+        //notification date shared with other plants -> remove this plant from notification.plantId array
         const updatedPlantIds = notification.plantIds.filter(
           (id) => id !== plantId
         );
@@ -248,74 +303,7 @@ async function handleEditNotifications(
     console.log("Error updating notification");
     updatedNotifications = notifications;
   }
-
   return updatedNotifications;
-
-  //let updatedNotifications: notificationType[] = [];
-
-  // let addedToExistingNotification = false;
-  // let now: number = Date.now();
-  // for (let i = 0; i < notifications.length; i++) {
-  //   let notification = notifications[i];
-  //   //remove old notifications
-  //   if (notification.triggerTimestamp < now) {
-  //     continue;
-  //   }
-  //   //modify previous notification
-  //   if (isSameDay(prevNextWateredTimestamp, notification.triggerTimestamp)) {
-  //     if (notification.plantIds.includes(plantId)) {
-  //       //previous notification date linked to this plant only -> cancel notification and remove from notifications array
-  //       if (notification.plantIds.length === 1) {
-  //         await Notifications.cancelScheduledNotificationAsync(notification.id);
-  //         continue;
-  //       }
-  //       //previous notification date shared with other plants -> remove this plant from plantId array
-  //       const updatedPlantIds = notification.plantIds.filter(
-  //         (id) => id !== plantId
-  //       );
-  //       updatedNotifications.push({
-  //         ...notification,
-  //         plantIds: updatedPlantIds,
-  //       });
-  //     } else {
-  //       updatedNotifications.push(notification);
-  //     }
-  //     continue;
-  //   }
-  //   //add current notification: notification for this date already exists -> add to existing notification's plantIds
-  //   if (isSameDay(currentNextWateredTimestamp, notification.triggerTimestamp)) {
-  //     let newNotification = notification;
-  //     if (!notification.plantIds.includes(plantId)) {
-  //       const newPlantIds = [...notification.plantIds, plantId];
-  //       newNotification = { ...newNotification, plantIds: newPlantIds };
-  //     }
-  //     updatedNotifications.push(newNotification);
-  //     addedToExistingNotification = true;
-  //   } else {
-  //     updatedNotifications.push(notification);
-  //   }
-  // }
-  // //add current notification: notification for this date doesn't exist -> schedule new notification and add to list
-  // if (!addedToExistingNotification) {
-  //   const triggerDate = set(new Date(currentNextWateredTimestamp), {
-  //     hours: timeOfDay.hours,
-  //     minutes: timeOfDay.minutes,
-  //   });
-  //   const triggerTimestamp = triggerDate.getTime();
-  //   const pushNotificationId = await scheduleNotification(triggerDate);
-  //   if (!pushNotificationId) {
-  //     console.error("Unable to create notification");
-  //     return updatedNotifications;
-  //   }
-  //   const newNotification: notificationType = {
-  //     id: pushNotificationId,
-  //     plantIds: [plantId],
-  //     triggerTimestamp,
-  //   };
-  //   updatedNotifications.push(newNotification);
-  // }
-  // console.log(updatedNotifications);
-  // return updatedNotifications;
 }
 
 async function handleAddNotification(
@@ -329,9 +317,11 @@ async function handleAddNotification(
   let now: number = Date.now();
   for (let i = 0; i < notifications.length; i++) {
     let notification = notifications[i];
+    //remove old notifications
     if (notification.triggerTimestamp < now) {
       continue;
     }
+    //add plant to existing notifications
     if (isSameDay(nextWaterTimestamp, notification.triggerTimestamp)) {
       let newNotification = notification;
       if (!notification.plantIds.includes(plantId)) {
@@ -344,6 +334,7 @@ async function handleAddNotification(
       updatedNotifications.push(notification);
     }
   }
+  //if no existing notification, create new notification
   if (!addedToExistingNotification) {
     const triggerDate = set(new Date(nextWaterTimestamp), {
       hours: timeOfDay.hours,

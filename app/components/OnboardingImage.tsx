@@ -7,7 +7,9 @@ type Props = {
     | "onboarding2Main"
     | "calendarImg"
     | "notifications"
-    | "arrow";
+    | "arrow"
+    | "leavesFull"
+    | "leavesHalf";
   imgWidth: number;
   imgHeight: number;
 };
@@ -18,6 +20,8 @@ const images = {
   calendarImg: require("@/assets/calendarImg.png"),
   arrow: require("@/assets/arrow.png"),
   notifications: require("@/assets/notifications.png"),
+  leavesFull: require("@/assets/leavesFull.png"),
+  leavesHalf: require("@/assets/leavesHalf.png"),
 };
 
 export default function OnboardingImage({

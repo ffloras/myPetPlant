@@ -1,13 +1,15 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import { useUserStore } from "../store/userStore";
 import { useRouter } from "expo-router";
 import PlantImage from "./components/PlantImage";
 import { theme } from "@/themes";
 import OnboardingImage from "./components/OnboardingImage";
+import { useWindowDimensions } from "react-native";
 
 export default function Onboarding() {
   const router = useRouter();
   const toggleHasOnboarded = useUserStore((state) => state.toggleHasOnboarded);
+  const { height } = useWindowDimensions();
 
   const handlePress = () => {
     toggleHasOnboarded();
@@ -15,26 +17,44 @@ export default function Onboarding() {
   };
 
   return (
-    <Pressable style={styles.container} onPress={handlePress}>
-      <Text style={[styles.text, styles.headingText]}>My Pet Plant</Text>
+    <Pressable
+      style={[styles.container, { paddingTop: height / 8 }]}
+      onPress={handlePress}
+    >
+      <View style={styles.topContainer}>
+        <Text
+          style={[
+            styles.text,
+            styles.headingText,
+            { paddingBottom: height / 50 },
+          ]}
+        >
+          My Pet Plant
+        </Text>
 
-      <OnboardingImage
-        name="onboarding2Main"
-        imgWidth={1024}
-        imgHeight={1024}
-      />
-      <Text style={[styles.text, styles.descriptionText]}>
-        Recieve notifications when your plants need watering
-      </Text>
-      <OnboardingImage name="notifications" imgWidth={1024} imgHeight={250} />
-      <View style={styles.spacer44}></View>
-      <View style={styles.startButton}>
-        <Text style={[styles.text, styles.subheadingText]}>Start</Text>
         <OnboardingImage
-          name="arrow"
-          imgWidth={150}
-          imgHeight={120}
-          size={40}
+          name="onboarding2Main"
+          imgWidth={1024}
+          imgHeight={1024}
+        />
+        <Text
+          style={[
+            styles.text,
+            styles.descriptionText,
+            { paddingTop: height / 30, paddingBottom: height / 100 },
+          ]}
+        >
+          Recieve notifications when it's time to water your plants
+        </Text>
+        <OnboardingImage name="notifications" imgWidth={1024} imgHeight={250} />
+      </View>
+
+      <View style={styles.leaves}>
+        <OnboardingImage
+          name="leavesFull"
+          imgWidth={200}
+          imgHeight={100}
+          size={50}
         />
       </View>
     </Pressable>
@@ -46,36 +66,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colorPaleGreen,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
+  },
+  topContainer: {
+    alignItems: "center",
+    width: "90%",
   },
   text: {
     color: theme.colorDarkGreen,
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
     textAlign: "center",
   },
   headingText: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: "bold",
-    paddingBottom: 16,
-  },
-  subheadingText: {
-    fontSize: 26,
-    fontWeight: "bold",
-    paddingHorizontal: 4,
   },
   descriptionText: {
     fontSize: 18,
-    width: "90%",
-    paddingTop: 6,
-    paddingBottom: 4,
     fontWeight: "bold",
   },
-  startButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  spacer44: {
-    height: 44,
+  leaves: {
+    paddingBottom: 48,
   },
 });

@@ -49,7 +49,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   text: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: "600",
   },
   dateButton: {
     paddingVertical: 10,
@@ -58,17 +59,19 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   buttonAdd: {
-    width: 120,
+    width: 135,
   },
   buttonEdit: {
-    width: 135,
+    width: 155,
   },
   dateText: {
     color: theme.colorMidGrey,
     textAlign: "center",
+    fontWeight: "600",
   },
   dateTextSelected: {
     color: theme.colorBlack,
     textAlign: "center",
+    fontWeight: "600",
   },
 });

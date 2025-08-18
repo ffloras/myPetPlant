@@ -15,7 +15,7 @@ export default function LastWateredInput({
   return (
     <View style={styles.inputRow}>
       <Ionicons name={"leaf"} size={24} color={theme.colorGreen} />
-      <Text style={[styles.text, styles.lastWateredText]}>Last Watered</Text>
+      <Text style={[styles.text, styles.lastWateredText]}>Last Watered:</Text>
       <Pressable style={styles.dateButton} onPress={onPress}>
         <Text style={[styles.text, styles.dateText]}>
           {lastWatered ? format(lastWatered, "eee MMM d") : "N/A"}
@@ -30,23 +30,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    gap: "12",
     paddingVertical: 10,
   },
   text: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: "600",
   },
   lastWateredText: {
-    paddingRight: 0,
+    paddingLeft: 12,
+    fontWeight: "600",
   },
   dateButton: {
     paddingVertical: 10,
-    borderWidth: 2,
-    borderRadius: 6,
-    borderColor: theme.colorLightGrey,
-    width: 100,
+    width: 135,
   },
   dateText: {
     textAlign: "center",
+    textDecorationLine: "underline",
+    color: theme.colorDarkGreen,
+    fontWeight: "600",
   },
 });

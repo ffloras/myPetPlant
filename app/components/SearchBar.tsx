@@ -31,11 +31,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingTop: 6,
+    marginBottom: -6,
   },
   textInput: {
     borderWidth: 2,
     borderColor: theme.colorLightGrey,
     backgroundColor: theme.colorWhite,
     width: "100%",
+    borderRadius: 6,
   },
 });

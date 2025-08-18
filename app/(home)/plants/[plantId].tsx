@@ -246,6 +246,7 @@ export default function PlantEdit() {
       <PlantActionButton
         title="Delete"
         onPress={handleDelete}
+        darkMode
         color={[theme.colorLightGrey, theme.colorLightGrey]}
       />
       {datePickerVisible ? (

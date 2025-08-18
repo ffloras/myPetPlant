@@ -42,11 +42,13 @@ const styles = StyleSheet.create({
   frequencyInput: {
     borderWidth: 2,
     borderRadius: 6,
-    width: 50,
+    width: 55,
     borderColor: theme.colorLightGrey,
     textAlign: "center",
+    fontWeight: "600",
   },
   text: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

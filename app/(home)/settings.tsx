@@ -1,12 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-  Alert,
-  TextInput,
-} from "react-native";
+import { StyleSheet, Text, View, Pressable, Alert } from "react-native";
 import { useUserStore } from "../../store/userStore";
 import { useRouter } from "expo-router";
 import { useNotificationStore } from "@/store/notificationStore";
@@ -16,6 +9,7 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { format, set } from "date-fns";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function Settings() {
   const router = useRouter();
@@ -74,23 +68,35 @@ export default function Settings() {
   return (
     <View style={styles.container}>
       <View>
+        <Text style={styles.heading}>Notifications </Text>
         <View style={styles.row}>
-          <Text>Notifications </Text>
           <Pressable
             style={styles.notificationButton}
             onPress={toggleIsNotificationOn}
           >
-            <Text style={styles.NotificationText}>
+            <MaterialIcons
+              name={isNotificationOn ? "notifications-on" : "notifications-off"}
+              size={32}
+              color={isNotificationOn ? theme.colorGreen : theme.colorGrey}
+            />
+            <Text
+              style={[
+                styles.NotificationText,
+                isNotificationOn ? undefined : styles.NotificationTextOff,
+              ]}
+            >
               {isNotificationOn ? "On" : "Off"}
             </Text>
           </Pressable>
-        </View>
-        <View style={styles.row}>
-          <Text>Notification Time</Text>
           <Pressable
             style={styles.notificationButton}
             onPress={handleNotificationTime}
           >
+            <MaterialIcons
+              name="access-time"
+              size={32}
+              color={theme.colorGreen}
+            />
             <Text style={styles.NotificationText}>{`${format(
               time,
               "hh"
@@ -98,6 +104,7 @@ export default function Settings() {
           </Pressable>
         </View>
       </View>
+
       {timePickerVisible ? (
         <DateTimePicker value={time} mode="time" onChange={onChangeTime} />
       ) : undefined}
@@ -117,8 +124,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    paddingHorizontal: 48,
+    paddingTop: 40,
+  },
+  heading: {
+    fontSize: 20,
+    fontWeight: "bold",
   },
   notificationButton: {
     width: 120,
@@ -126,15 +137,26 @@ const styles = StyleSheet.create({
     borderColor: theme.colorLightGrey,
     borderRadius: 6,
     padding: 4,
+    alignItems: "center",
+    gap: 4,
+    height: 120,
+    justifyContent: "center",
+    shadowColor: theme.colorBlack,
+    backgroundColor: theme.colorWhite,
+    elevation: 3,
   },
   row: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    width: "80%",
     alignItems: "center",
     paddingVertical: 8,
+    gap: 12,
   },
   NotificationText: {
     textAlign: "center",
+    fontSize: 16,
+    color: theme.colorGreen,
+  },
+  NotificationTextOff: {
+    color: theme.colorGrey,
   },
 });

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ScrollView, StyleSheet, View, Alert } from "react-native";
+import { ScrollView, StyleSheet, View, Alert, Text } from "react-native";
 import uuid from "react-native-uuid";
 import PlantImagePicker from "../components/PlantImagePicker";
 import * as ImagePicker from "expo-image-picker";
@@ -13,6 +13,7 @@ import { useNotificationStore } from "@/store/notificationStore";
 import NameInput from "../components/NameInput";
 import FrequencyInput from "../components/FrequencyInput";
 import DateInput from "../components/DateInput";
+import { theme } from "@/themes";
 
 export default function NewPlant() {
   const addPlant = usePlantStore((store) => store.addPlant);
@@ -142,6 +143,7 @@ export default function NewPlant() {
         onPressImage={handleChooseImage}
         onPressCamera={handleUseCamera}
       />
+      <Text style={styles.infoHeading}>My Plant Info</Text>
       <View style={styles.inputContainer}>
         <NameInput plantName={plantName} onChangeText={setPlantName} />
         <FrequencyInput
@@ -179,6 +181,13 @@ const styles = StyleSheet.create({
   inputContainer: {
     alignItems: "flex-start",
     justifyContent: "space-between",
-    paddingBottom: 30,
+    paddingBottom: 50,
+  },
+  infoHeading: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+    paddingTop: 10,
+    color: theme.colorGreen,
   },
 });
