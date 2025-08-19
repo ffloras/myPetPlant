@@ -14,6 +14,9 @@ import NameInput from "../components/NameInput";
 import FrequencyInput from "../components/FrequencyInput";
 import DateInput from "../components/DateInput";
 import { theme } from "@/themes";
+import NotesInput from "../components/NotesInput";
+import HeaderIcon from "../components/HeaderIcon";
+import { useWindowDimensions } from "react-native";
 
 export default function NewPlant() {
   const addPlant = usePlantStore((store) => store.addPlant);
@@ -26,8 +29,25 @@ export default function NewPlant() {
   const [plantName, setPlantName] = useState<string>();
   const [frequencyDays, setFrequenceDays] = useState<string>();
   const [date, setDate] = useState<Date>();
+  const [notes, setNotes] = useState<(string | undefined)[]>([undefined]);
   const [datePickerVisible, setDatePickerVisible] = useState<boolean>(false);
   const router = useRouter();
+  const { width } = useWindowDimensions();
+
+  const handleChangeNotes = (value: string, noteNumber: number) => {
+    setNotes((prev) => {
+      if (noteNumber < prev.length) {
+        let newNotes = [...prev];
+        newNotes[noteNumber] = value;
+        return newNotes;
+      }
+      return prev;
+    });
+  };
+
+  const handleAddNote = () => {
+    setNotes((prev) => [...prev, undefined]);
+  };
 
   const handleChooseImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -118,6 +138,8 @@ export default function NewPlant() {
     }
 
     const plantId = uuid.v4();
+    const newNotes = notes.filter((note) => note);
+    console.log(newNotes);
 
     const newPlant: PlantType = {
       id: plantId,
@@ -125,6 +147,7 @@ export default function NewPlant() {
       wateringFrequencyDays: Number(frequencyDays),
       nextWateredAtTimestamp: date.getTime(),
       imageUri: imageUri,
+      notes: newNotes,
     };
 
     addPlant(newPlant);
@@ -151,6 +174,19 @@ export default function NewPlant() {
           onChangeText={setFrequenceDays}
         />
         <DateInput date={date} onPress={openDatePicker} type="add" />
+      </View>
+      <View style={styles.notesHeadingContainer}>
+        <Text style={styles.notesHeading}>Notes</Text>
+        <HeaderIcon icon="pluscircleo" onPress={handleAddNote} />
+      </View>
+      <View style={[styles.inputContainer, styles.notesBodyContainer]}>
+        {notes.map((note, index) => (
+          <NotesInput
+            note={note}
+            onChangeText={(value) => handleChangeNotes(value, index)}
+            key={index}
+          />
+        ))}
       </View>
       <PlantActionButton title="Add Plant" onPress={handleAddPlant} />
       {datePickerVisible ? (
@@ -180,8 +216,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     alignItems: "flex-start",
-    justifyContent: "space-between",
-    paddingBottom: 50,
+    width: "78%",
   },
   infoHeading: {
     textAlign: "center",
@@ -189,5 +224,25 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     paddingTop: 10,
     color: theme.colorGreen,
+  },
+  notesHeadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+    paddingLeft: 32,
+    paddingTop: 16,
+  },
+  notesBodyContainer: {
+    paddingBottom: 50,
+  },
+  notesHeading: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+    color: theme.colorGreen,
+  },
+  plusIcon: {
+    paddingTop: 10,
   },
 });

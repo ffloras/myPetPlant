@@ -1,14 +1,14 @@
 import { ColorValue, Pressable, Text, StyleSheet } from "react-native";
 import { theme } from "@/themes";
 import { LinearGradient } from "expo-linear-gradient";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 type PlantActionButtonType = {
   title?: string;
   onPress: () => void;
   buttonWidth?: number;
   color?: [ColorValue, ColorValue, ...ColorValue[]];
-  icon?: "check";
+  icon?: "water-check";
   darkMode?: boolean;
 };
 
@@ -37,7 +37,11 @@ export default function PlantActionButton({
         }}
       >
         {icon ? (
-          <FontAwesome name={icon} size={24} color={theme.colorWhite} />
+          <MaterialCommunityIcons
+            name="water-check"
+            size={32}
+            color={theme.colorWhite}
+          />
         ) : undefined}
         {title ? (
           <Text style={[styles.text, darkMode ? styles.textDark : undefined]}>

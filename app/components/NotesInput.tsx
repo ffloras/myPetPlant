@@ -1,30 +1,31 @@
 import { View, StyleSheet, TextInput } from "react-native";
 import { theme } from "@/themes";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Dispatch, SetStateAction } from "react";
 import { useWindowDimensions } from "react-native";
 
-type NameInputType = {
-  plantName?: string;
-  onChangeText: Dispatch<SetStateAction<string | undefined>>;
+type NotesInputType = {
+  note?: string;
+  onChangeText: (value: string) => void | undefined;
 };
 
-export default function NameInput({ plantName, onChangeText }: NameInputType) {
+export default function NotesInput({ note, onChangeText }: NotesInputType) {
   const { width } = useWindowDimensions();
 
   return (
-    <View style={[styles.inputRow]}>
+    <View style={styles.inputRow}>
       <Ionicons
-        name={plantName ? "leaf" : "leaf-outline"}
+        name={note ? "leaf" : "leaf-outline"}
         size={24}
         color={theme.colorGreen}
       />
       <TextInput
-        style={[styles.nameInput, styles.text, { width: width / 1.58 }]}
-        placeholder="Name"
-        value={plantName}
+        style={[styles.notesInput, styles.text, { width: width / 1.58 }]}
+        placeholder="About my plant"
+        value={note}
+        multiline
+        submitBehavior="blurAndSubmit"
         onChangeText={onChangeText}
-        autoCapitalize="words"
+        autoCapitalize="sentences"
       ></TextInput>
     </View>
   );
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingVertical: 10,
   },
-  nameInput: {
+  notesInput: {
     borderWidth: 2,
     borderRadius: 6,
     borderColor: theme.colorLightGrey,

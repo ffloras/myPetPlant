@@ -40,10 +40,10 @@ export default function PlantEdit() {
   const [frequencyDays, setFrequenceDays] = useState<string | undefined>(
     plant?.wateringFrequencyDays.toString()
   );
-  const [date, setDate] = useState<Date | undefined>(
-    plant ? new Date(plant.nextWateredAtTimestamp) : undefined
-  );
-  const [datePickerVisible, setDatePickerVisible] = useState<boolean>(false);
+  // const [date, setDate] = useState<Date | undefined>(
+  //   plant ? new Date(plant.nextWateredAtTimestamp) : undefined
+  // );
+  // const [datePickerVisible, setDatePickerVisible] = useState<boolean>(false);
   const [lastWatered, setLastWatered] = useState<number | undefined>(
     plant ? plant.lastWateredAtTimestamp : undefined
   );
@@ -94,17 +94,17 @@ export default function PlantEdit() {
     }
   };
 
-  const openDatePicker = () => {
-    setDatePickerVisible(true);
-  };
+  // const openDatePicker = () => {
+  //   setDatePickerVisible(true);
+  // };
 
-  const onChangeDate = (
-    event: DateTimePickerEvent,
-    selectedDate: Date | undefined
-  ) => {
-    setDate(selectedDate ?? new Date(Date.now()));
-    setDatePickerVisible(false);
-  };
+  // const onChangeDate = (
+  //   event: DateTimePickerEvent,
+  //   selectedDate: Date | undefined
+  // ) => {
+  //   setDate(selectedDate ?? new Date(Date.now()));
+  //   setDatePickerVisible(false);
+  // };
 
   const handleEditPlant = () => {
     if (!plantName) {
@@ -127,27 +127,33 @@ export default function PlantEdit() {
         "Watering frequency must be a whole number"
       );
     }
-    if (!date) {
-      return Alert.alert(
-        "Please enter a watering date",
-        `When is the next time ${
-          plantName ? plantName : "your plant?"
-        } needs to be watered?`
-      );
-    }
-    const endOfToday = new Date().setHours(23, 59, 59, 999);
-    if (date.getTime() < endOfToday) {
-      return Alert.alert(
-        "Please re-enter the watering date",
-        `${date.toLocaleDateString()} is invalid. The next watering date must start on a future date`
-      );
+    // if (!date) {
+    //   return Alert.alert(
+    //     "Please enter a watering date",
+    //     `When is the next time ${
+    //       plantName ? plantName : "your plant?"
+    //     } needs to be watered?`
+    //   );
+    // }
+    // const endOfToday = new Date().setHours(23, 59, 59, 999);
+    // if (date.getTime() < endOfToday) {
+    //   return Alert.alert(
+    //     "Please re-enter the watering date",
+    //     `${date.toLocaleDateString()} is invalid. The next watering date must start on a future date`
+    //   );
+    // }
+
+    if (!plant) {
+      Alert.alert("Unable to update plant info", "Please try again");
+      router.back();
+      return;
     }
 
     const editedPlant: PlantType = {
-      id: plant?.id ?? (plantId as string),
+      id: plant.id,
       name: plantName,
       wateringFrequencyDays: Number(frequencyDays),
-      nextWateredAtTimestamp: date.getTime(),
+      nextWateredAtTimestamp: plant.nextWateredAtTimestamp,
       lastWateredAtTimestamp: lastWatered,
       prevLastWateredAtTimestamp: prevLastWatered,
       imageUri: imageUri,
@@ -235,7 +241,7 @@ export default function PlantEdit() {
           frequencyDays={frequencyDays}
           onChangeText={setFrequenceDays}
         />
-        <DateInput date={date} onPress={openDatePicker} type="edit" />
+        {/* <DateInput date={date} onPress={openDatePicker} type="edit" /> */}
         <LastWateredInput
           lastWatered={lastWatered}
           onPress={handleLastWateredDate}
@@ -249,14 +255,14 @@ export default function PlantEdit() {
         darkMode
         color={[theme.colorLightGrey, theme.colorLightGrey]}
       />
-      {datePickerVisible ? (
+      {/* {datePickerVisible ? (
         <DateTimePicker
           value={date ?? new Date(Date.now())}
           mode="date"
           display="default"
           onChange={onChangeDate}
         />
-      ) : undefined}
+      ) : undefined} */}
     </ScrollView>
   );
 }

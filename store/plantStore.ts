@@ -11,6 +11,7 @@ export type PlantType = {
   prevLastWateredAtTimestamp?: number;
   nextWateredAtTimestamp: number;
   imageUri?: string;
+  notes?: (string | undefined)[];
 };
 
 type PlantsState = {

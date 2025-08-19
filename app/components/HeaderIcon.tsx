@@ -3,7 +3,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { theme } from "@/themes";
 
 type HeaderIconType = {
-  icon: "setting" | "search1" | "pluscircleo" | "close";
+  icon: "setting" | "search1" | "pluscircleo" | "close" | "circledowno";
   onPress: () => void;
 };
 

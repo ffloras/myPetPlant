@@ -10,7 +10,6 @@
     "newArchEnabled": true,
     "expo-splash-screen": {
       "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
       "backgroundColor": "#e6f3e2",
       "imageWidth": 150,
       "dark": {
@@ -24,7 +23,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#65b655"
       },
       "edgeToEdgeEnabled": true,
       "softwareKeyboardLayoutMode": "pan",

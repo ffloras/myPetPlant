@@ -7,7 +7,6 @@ type Props = {
     | "onboarding2Main"
     | "calendarImg"
     | "notifications"
-    | "arrow"
     | "leavesFull"
     | "leavesHalf";
   imgWidth: number;
@@ -18,7 +17,6 @@ const images = {
   onboarding1Main: require("@/assets/onboarding1Main.png"),
   onboarding2Main: require("@/assets/onboarding2Main.png"),
   calendarImg: require("@/assets/calendarImg.png"),
-  arrow: require("@/assets/arrow.png"),
   notifications: require("@/assets/notifications.png"),
   leavesFull: require("@/assets/leavesFull.png"),
   leavesHalf: require("@/assets/leavesHalf.png"),

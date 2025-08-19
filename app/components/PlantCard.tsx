@@ -1,5 +1,5 @@
 import { PlantType, usePlantStore } from "@/store/plantStore";
-import { View, StyleSheet, Text, Pressable } from "react-native";
+import { View, StyleSheet, Text, Pressable, Alert } from "react-native";
 import { differenceInDays, format } from "date-fns";
 import { theme } from "@/themes";
 import PlantActionButton from "./PlantActionButton";
@@ -7,10 +7,16 @@ import PlantImage from "./PlantImage";
 import { useEffect, useState } from "react";
 import { Link } from "expo-router";
 import { useNotificationStore } from "@/store/notificationStore";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import PlantCardNotes from "./PlantCardNotes";
 
 type WateringStateType = {
   status: "green" | "alert" | "danger";
-  message: string;
+  message: React.ReactNode;
 };
 
 export default function PlantCard({ plant }: { plant: PlantType }) {
@@ -19,6 +25,39 @@ export default function PlantCard({ plant }: { plant: PlantType }) {
     (store) => store.updateNotifications
   );
   const [wateringState, setWateringState] = useState<WateringStateType>();
+  const editNextWateredAtTimestamp = usePlantStore(
+    (store) => store.editNextWateredAtTimestamp
+  );
+  const [datePickerVisible, setDatePickerVisible] = useState<boolean>(false);
+  const [notesVisible, setNotesVisible] = useState<boolean>(false);
+
+  const onChangeDate = (
+    event: DateTimePickerEvent,
+    selectedDate: Date | undefined
+  ) => {
+    if (!selectedDate) {
+      return;
+    }
+    const endOfToday = new Date().setHours(23, 59, 59, 999);
+    // if (selectedDate.getTime() < endOfToday) {
+    //   Alert.alert(
+    //     "Please re-enter the watering date",
+    //     `${selectedDate.toLocaleDateString()} is invalid. The next watering date must start on a future date`
+    //   );
+    //   setDatePickerVisible(false);
+    //   return;
+    // }
+    const prevNextWateredAtTimestamp = plant.nextWateredAtTimestamp;
+    const newNextWateredAtTimestamp = selectedDate.getTime();
+    updateNotification(
+      plant.id,
+      prevNextWateredAtTimestamp,
+      newNextWateredAtTimestamp
+    );
+    editNextWateredAtTimestamp(plant.id, newNextWateredAtTimestamp);
+
+    setDatePickerVisible(false);
+  };
 
   const getWateringState = (nextWatering: number): WateringStateType => {
     const endOfToday = new Date().setHours(23, 59, 59, 999);
@@ -26,22 +65,61 @@ export default function PlantCard({ plant }: { plant: PlantType }) {
     if (nextWatering > endOfToday) {
       return {
         status: "green",
-        message: `Water on ${format(nextWatering, "eee MMM d")}`,
+        message: (
+          <View style={styles.headingTextContainer}>
+            <Text style={styles.headingText}>Water on</Text>
+            <Pressable hitSlop={20} onPress={() => setDatePickerVisible(true)}>
+              <Text style={[styles.headingText, styles.dateText]}>
+                {format(nextWatering, "eee MMM d")}
+              </Text>
+            </Pressable>
+          </View>
+        ),
       };
     } else if (nextWatering > startOfToday) {
-      return { status: "alert", message: "Water today!" };
+      return {
+        status: "alert",
+        message: (
+          <View style={styles.headingTextContainer}>
+            <Text style={styles.headingText}>Water</Text>
+            <Pressable hitSlop={20} onPress={() => setDatePickerVisible(true)}>
+              <Text style={[styles.headingText, styles.dateText]}>Today</Text>
+            </Pressable>
+          </View>
+        ),
+      };
     } else {
-      const overdueDays = differenceInDays(Date.now(), nextWatering) + 1;
+      const overdueDays = differenceInDays(Date.now(), nextWatering);
       return {
         status: "danger",
-        message: `Overdue for ${overdueDays} day${overdueDays > 1 ? "s" : ""}`,
+        message: (
+          <View style={styles.headingTextContainer}>
+            <Text style={styles.headingText}>Overdue for</Text>
+            <Pressable hitSlop={20} onPress={() => setDatePickerVisible(true)}>
+              <Text
+                style={[styles.headingText, styles.dateText, styles.dangerText]}
+              >
+                {overdueDays} day{overdueDays > 1 ? "s" : ""}
+              </Text>
+            </Pressable>
+          </View>
+        ),
       };
     }
+  };
+
+  const handleOpenNotes = () => {
+    setNotesVisible(true);
+  };
+
+  const handleCloseNotes = () => {
+    setNotesVisible(false);
   };
 
   const handleWaterPlantPressed = () => {
     const msInDay = 24 * 60 * 60 * 1000;
     const prevNextWaterAtTimestamp = plant.nextWateredAtTimestamp;
+
     const currentNextWateredAtTimestamp =
       Date.now() + plant.wateringFrequencyDays * msInDay;
 
@@ -80,32 +158,51 @@ export default function PlantCard({ plant }: { plant: PlantType }) {
           wateringState?.status === "danger" ? styles.dangerHeading : undefined,
         ]}
       >
-        <Text style={styles.dateText}>{wateringState?.message}</Text>
+        {wateringState?.message}
+
         <PlantActionButton
-          icon="check"
+          icon="water-check"
           onPress={handleWaterPlantPressed}
           buttonWidth={50}
         />
       </View>
       <Link href={`plants/${plant.id}`} asChild>
-        <Pressable style={styles.bodyContainer}>
-          <PlantImage imageUri={plant.imageUri} size={140} />
-          <View style={styles.infoContainer}>
-            <Text style={styles.nameText} numberOfLines={1}>
-              {plant.name}
-            </Text>
-            <Text style={styles.infoText}>
-              Water every {plant.wateringFrequencyDays} days
-            </Text>
-            <Text style={styles.infoText}>
-              Last watered:
-              {plant.lastWateredAtTimestamp
-                ? ` ${format(plant.lastWateredAtTimestamp, "eee MMM d")}`
-                : " N/A"}
-            </Text>
+        <Pressable>
+          <View style={styles.bodyContainer}>
+            <PlantImage imageUri={plant.imageUri} size={140} />
+            <View style={styles.infoContainer}>
+              <Text style={styles.nameText} numberOfLines={1}>
+                {plant.name}
+              </Text>
+              <Text style={styles.infoText}>
+                Water every {plant.wateringFrequencyDays} days
+              </Text>
+              <Text style={styles.infoText}>
+                Last watered:
+                {plant.lastWateredAtTimestamp
+                  ? ` ${format(plant.lastWateredAtTimestamp, "eee MMM d")}`
+                  : " N/A"}
+              </Text>
+            </View>
           </View>
+          {notesVisible ? (
+            <PlantCardNotes notes={plant.notes} onPress={handleCloseNotes} />
+          ) : undefined}
         </Pressable>
       </Link>
+      {datePickerVisible ? (
+        <DateTimePicker
+          value={new Date(plant.nextWateredAtTimestamp) ?? new Date(Date.now())}
+          mode="date"
+          display="default"
+          onChange={onChangeDate}
+        />
+      ) : undefined}
+      {notesVisible ? undefined : (
+        <Pressable style={styles.downIcon} onPress={handleOpenNotes}>
+          <AntDesign name="circledowno" size={24} color={theme.colorGreen} />
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -118,6 +215,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colorWhite,
     shadowColor: theme.colorBlack,
     elevation: 3,
+    position: "relative",
   },
   greenContainer: {
     borderColor: theme.colorPaleGreen,
@@ -128,6 +226,9 @@ const styles = StyleSheet.create({
   dangerContainer: {
     borderColor: theme.colorDanger,
   },
+  dangerText: {
+    color: theme.colorDarkGreen,
+  },
   headingContainer: {
     borderTopLeftRadius: 6,
     borderTopRightRadius: 6,
@@ -135,6 +236,10 @@ const styles = StyleSheet.create({
     padding: 4,
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  headingTextContainer: {
+    flexDirection: "row",
+    gap: 6,
   },
   greenHeading: {
     backgroundColor: theme.colorPaleGreen,
@@ -145,10 +250,14 @@ const styles = StyleSheet.create({
   dangerHeading: {
     backgroundColor: theme.colorDanger,
   },
-  dateText: {
+  headingText: {
     fontSize: 16,
     fontWeight: "bold",
     color: theme.colorDarkGreen,
+  },
+  dateText: {
+    color: theme.colorGreen,
+    textDecorationLine: "underline",
   },
   bodyContainer: {
     flexDirection: "row",
@@ -158,11 +267,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexWrap: "wrap",
     flex: 1,
-    paddingBottom: 8,
+    paddingBottom: 16,
   },
   nameText: {
     fontSize: 18,
     color: theme.colorBlack,
+    width: "90%",
   },
   infoText: {
     borderColor: theme.colorBlack,
@@ -170,5 +280,17 @@ const styles = StyleSheet.create({
     width: "100%",
     fontSize: 13,
     color: theme.colorGrey,
+  },
+  downIconContainer: {
+    alignItems: "flex-end",
+    height: 30,
+  },
+  downIcon: {
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "flex-end",
+    position: "absolute",
+    bottom: 0,
+    right: 0,
   },
 });

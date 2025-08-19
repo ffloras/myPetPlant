@@ -26,7 +26,7 @@ type notificationStoreType = {
   addNotification: (plantId: string, nextWateredAtTimestamp: number) => void;
   updateNotifications: (
     plantId: string,
-    prevLastWateredAtTimestamp: number,
+    prevNextWateredAtTimestamp: number,
     currentNextWateredAtTimestamp: number
   ) => void;
   resetNotifications: () => void;
@@ -73,7 +73,7 @@ export const useNotificationStore = create(
       },
       updateNotifications: async (
         plantId: string,
-        prevLastWateredAtTimestamp: number,
+        prevNextWateredAtTimestamp: number,
         currentNextWateredAtTimestamp: number
       ) => {
         const notifications = useNotificationStore.getState().notifications;
@@ -81,7 +81,7 @@ export const useNotificationStore = create(
         const updatedNotifications = await handleEditNotifications(
           notifications,
           plantId,
-          prevLastWateredAtTimestamp,
+          prevNextWateredAtTimestamp,
           currentNextWateredAtTimestamp,
           timeOfDay
         );
