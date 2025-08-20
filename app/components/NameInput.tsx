@@ -20,7 +20,7 @@ export default function NameInput({ plantName, onChangeText }: NameInputType) {
         color={theme.colorGreen}
       />
       <TextInput
-        style={[styles.nameInput, styles.text, { width: width / 1.58 }]}
+        style={[styles.nameInput, styles.text]}
         placeholder="Name"
         value={plantName}
         onChangeText={onChangeText}
@@ -48,5 +48,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     fontWeight: "600",
+    width: "87%",
   },
 });

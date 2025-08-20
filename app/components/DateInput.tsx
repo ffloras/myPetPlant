@@ -7,10 +7,9 @@ import { useWindowDimensions } from "react-native";
 type DateInputType = {
   date?: Date;
   onPress: () => void;
-  type: "add" | "edit";
 };
 
-export default function DateInput({ date, onPress, type }: DateInputType) {
+export default function DateInput({ date, onPress }: DateInputType) {
   const { width } = useWindowDimensions();
 
   return (
@@ -20,25 +19,19 @@ export default function DateInput({ date, onPress, type }: DateInputType) {
         size={24}
         color={theme.colorGreen}
       />
-      <Text style={styles.text}>
-        {type === "add" ? "Starting on" : "Water on"}
-      </Text>
-      <Pressable
-        style={[
-          styles.dateButton,
-          type === "add" ? { width: width / 2.8 } : styles.buttonEdit,
-        ]}
-        onPress={onPress}
-      >
-        <Text
-          style={[
-            styles.text,
-            date ? styles.dateTextSelected : styles.dateText,
-          ]}
-        >
-          {date ? format(date, "eee MMM d") : "Select Date"}
-        </Text>
-      </Pressable>
+      <View style={styles.textRow}>
+        <Text style={styles.text}>Starting on </Text>
+        <Pressable style={[styles.dateButton]} onPress={onPress}>
+          <Text
+            style={[
+              styles.text,
+              date ? styles.dateTextSelected : styles.dateText,
+            ]}
+          >
+            {date ? format(date, "eee MMM d") : "Select Date"}
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -56,11 +49,18 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: theme.colorBlack,
   },
+  textRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "87%",
+  },
   dateButton: {
     paddingVertical: 10,
     borderWidth: 2,
     borderColor: theme.colorLightGrey,
     borderRadius: 6,
+    width: "55%",
   },
   buttonEdit: {
     width: 155,

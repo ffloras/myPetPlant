@@ -166,20 +166,22 @@ export default function NewPlant() {
         onPressImage={handleChooseImage}
         onPressCamera={handleUseCamera}
       />
-      <Text style={styles.infoHeading}>My Plant Info</Text>
+
       <View style={styles.inputContainer}>
+        <Text style={styles.infoHeading}>My Plant Info</Text>
         <NameInput plantName={plantName} onChangeText={setPlantName} />
         <FrequencyInput
           frequencyDays={frequencyDays}
           onChangeText={setFrequenceDays}
         />
-        <DateInput date={date} onPress={openDatePicker} type="add" />
+        <DateInput date={date} onPress={openDatePicker} />
       </View>
-      <View style={styles.notesHeadingContainer}>
-        <Text style={styles.notesHeading}>Notes</Text>
-        <HeaderIcon icon="pluscircleo" onPress={handleAddNote} />
-      </View>
+
       <View style={[styles.inputContainer, styles.notesBodyContainer]}>
+        <View style={styles.notesHeadingContainer}>
+          <Text style={styles.notesHeading}>Notes</Text>
+          <HeaderIcon icon="pluscircleo" onPress={handleAddNote} />
+        </View>
         {notes.map((note, index) => (
           <NotesInput
             note={note}
@@ -216,33 +218,29 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     alignItems: "flex-start",
-    width: "78%",
+    paddingBottom: 20,
+    width: "80%",
   },
   infoHeading: {
-    textAlign: "center",
+    textAlign: "left",
     fontSize: 20,
     fontWeight: "bold",
-    paddingTop: 10,
+    paddingTop: 20,
+    paddingBottom: 10,
     color: theme.colorGreen,
   },
   notesHeadingContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    paddingLeft: 32,
-    paddingTop: 16,
+    gap: 10,
+    paddingVertical: 10,
   },
   notesBodyContainer: {
     paddingBottom: 50,
   },
   notesHeading: {
-    textAlign: "center",
     fontSize: 20,
     fontWeight: "bold",
     color: theme.colorGreen,
-  },
-  plusIcon: {
-    paddingTop: 10,
   },
 });

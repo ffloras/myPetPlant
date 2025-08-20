@@ -14,6 +14,8 @@ import NameInput from "@/app/components/NameInput";
 import FrequencyInput from "@/app/components/FrequencyInput";
 import DateInput from "@/app/components/DateInput";
 import LastWateredInput from "@/app/components/LastWateredInput";
+import HeaderIcon from "@/app/components/HeaderIcon";
+import NotesInput from "@/app/components/NotesInput";
 
 export default function PlantEdit() {
   const router = useRouter();
@@ -48,12 +50,30 @@ export default function PlantEdit() {
     plant ? plant.lastWateredAtTimestamp : undefined
   );
   let prevLastWatered: number | undefined = plant?.prevLastWateredAtTimestamp;
+  const [notes, setNotes] = useState<(string | undefined)[]>(
+    plant?.notes ?? [undefined]
+  );
 
   useEffect(() => {
     navigation.setOptions({
       title: `Edit ${plant?.name}`,
     });
   }, [plant?.name, navigation]);
+
+  const handleChangeNotes = (value: string, noteNumber: number) => {
+    setNotes((prev) => {
+      if (noteNumber < prev.length) {
+        let newNotes = [...prev];
+        newNotes[noteNumber] = value;
+        return newNotes;
+      }
+      return prev;
+    });
+  };
+
+  const handleAddNote = () => {
+    setNotes((prev) => [...prev, undefined]);
+  };
 
   const handleChooseImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -157,6 +177,7 @@ export default function PlantEdit() {
       lastWateredAtTimestamp: lastWatered,
       prevLastWateredAtTimestamp: prevLastWatered,
       imageUri: imageUri,
+      notes: notes,
     };
 
     const prevNextWaterAtTimestamp = plant?.nextWateredAtTimestamp;
@@ -235,7 +256,9 @@ export default function PlantEdit() {
         onPressImage={handleChooseImage}
         onPressCamera={handleUseCamera}
       />
+
       <View style={styles.inputContainer}>
+        <Text style={styles.infoHeading}>My Plant Info</Text>
         <NameInput plantName={plantName} onChangeText={setPlantName} />
         <FrequencyInput
           frequencyDays={frequencyDays}
@@ -246,6 +269,20 @@ export default function PlantEdit() {
           lastWatered={lastWatered}
           onPress={handleLastWateredDate}
         />
+      </View>
+
+      <View style={[styles.inputContainer, styles.notesBodyContainer]}>
+        <View style={styles.notesHeadingContainer}>
+          <Text style={styles.notesHeading}>Notes</Text>
+          <HeaderIcon icon="pluscircleo" onPress={handleAddNote} />
+        </View>
+        {notes.map((note, index) => (
+          <NotesInput
+            note={note}
+            onChangeText={(value) => handleChangeNotes(value, index)}
+            key={index}
+          />
+        ))}
       </View>
       <PlantActionButton title="Save" onPress={handleEditPlant} />
       <View style={styles.spacer}></View>
@@ -283,18 +320,37 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: theme.colorWhite,
   },
+  infoHeading: {
+    textAlign: "left",
+    fontSize: 20,
+    fontWeight: "bold",
+    paddingTop: 20,
+    paddingBottom: 10,
+    color: theme.colorGreen,
+  },
   camera: {
     marginVertical: 16,
   },
   inputContainer: {
     alignItems: "flex-start",
-    justifyContent: "space-between",
     paddingBottom: 20,
-  },
-  text: {
-    fontSize: 16,
+    width: "80%",
   },
   spacer: {
     height: 6,
+  },
+  notesHeadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 10,
+  },
+  notesBodyContainer: {
+    paddingBottom: 50,
+  },
+  notesHeading: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: theme.colorGreen,
   },
 });

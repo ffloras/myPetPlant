@@ -15,12 +15,14 @@ export default function LastWateredInput({
   return (
     <View style={styles.inputRow}>
       <Ionicons name={"leaf"} size={24} color={theme.colorGreen} />
-      <Text style={[styles.text, styles.lastWateredText]}>Last Watered:</Text>
-      <Pressable style={styles.dateButton} onPress={onPress}>
-        <Text style={[styles.text, styles.dateText]}>
-          {lastWatered ? format(lastWatered, "eee MMM d") : "N/A"}
-        </Text>
-      </Pressable>
+      <View style={styles.textRow}>
+        <Text style={[styles.text, styles.lastWateredText]}>Last Watered </Text>
+        <Pressable style={styles.dateButton} onPress={onPress}>
+          <Text style={[styles.text, styles.dateText]}>
+            {lastWatered ? format(lastWatered, "eee MMM d") : "N/A"}
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -31,6 +33,13 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     paddingVertical: 10,
+    gap: 12,
+  },
+  textRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "87%",
   },
   text: {
     fontSize: 16,
@@ -38,17 +47,17 @@ const styles = StyleSheet.create({
     color: theme.colorBlack,
   },
   lastWateredText: {
-    paddingLeft: 12,
     fontWeight: "600",
   },
   dateButton: {
     paddingVertical: 10,
-    width: 135,
+    borderWidth: 2,
+    borderColor: theme.colorLightGrey,
+    borderRadius: 6,
+    width: "50%",
   },
   dateText: {
     textAlign: "center",
-    textDecorationLine: "underline",
     color: theme.colorDarkGreen,
-    fontWeight: "600",
   },
 });

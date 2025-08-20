@@ -866,6 +866,11 @@
     "@eslint/core" "^0.15.2"
     levn "^0.4.1"
 
+"@expo-google-fonts/shantell-sans@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/shantell-sans/-/shantell-sans-0.4.0.tgz#e87ea2c2d80196cfe17eead31ff47844c6a5e6fa"
+  integrity sha512-J/VuIdEMUZVaNeL78ZKj0JLcLN01VKy/e9iIl+3ucJGg/Y4CPU24IkPchmSUYENKkPJ75uUTJqhnM6WfrhaXKw==
+
 "@expo/cli@0.24.20":
   version "0.24.20"
   resolved "https://registry.yarnpkg.com/@expo/cli/-/cli-0.24.20.tgz#c9a3ad7eb93b0d6a39da20ef8804976b65838790"

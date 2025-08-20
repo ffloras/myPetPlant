@@ -19,7 +19,7 @@ export default function NotesInput({ note, onChangeText }: NotesInputType) {
         color={theme.colorGreen}
       />
       <TextInput
-        style={[styles.notesInput, styles.text, { width: width / 1.58 }]}
+        style={[styles.notesInput, styles.text]}
         placeholder="About my plant"
         value={note}
         multiline
@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colorLightGrey,
     fontWeight: "600",
     paddingLeft: 8,
+    width: "87%",
   },
   text: {
     fontSize: 16,
