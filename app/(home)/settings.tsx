@@ -1,7 +1,6 @@
-import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, Pressable, Alert } from "react-native";
 import { useUserStore } from "../../store/userStore";
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useNotificationStore } from "@/store/notificationStore";
 import { theme } from "@/themes";
 import { useState } from "react";
@@ -104,18 +103,15 @@ export default function Settings() {
           </Pressable>
         </View>
       </View>
+      <View>
+        <Link style={styles.privacyPolicyContainer} href={""}>
+          <Text style={styles.privacyPolicyText}>Privacy Policy</Text>
+        </Link>
+      </View>
 
       {timePickerVisible ? (
         <DateTimePicker value={time} mode="time" onChange={onChangeTime} />
       ) : undefined}
-
-      <Pressable onPress={handlePress}>
-        <Text>back to Onboarding</Text>
-      </Pressable>
-      <Pressable onPress={handleResetNotification}>
-        <Text>Reset notification</Text>
-      </Pressable>
-      <StatusBar style="auto" />
     </View>
   );
 }
@@ -126,6 +122,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingHorizontal: 48,
     paddingTop: 40,
+    justifyContent: "space-between",
   },
   heading: {
     fontSize: 20,
@@ -158,5 +155,12 @@ const styles = StyleSheet.create({
   },
   NotificationTextOff: {
     color: theme.colorGrey,
+  },
+  privacyPolicyContainer: {
+    marginBottom: 50,
+  },
+  privacyPolicyText: {
+    color: theme.colorGreen,
+    textDecorationLine: "underline",
   },
 });
