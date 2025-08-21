@@ -11,5 +11,6 @@ export const theme = {
   colorMidGrey: "#9f9f9fff",
   colorLightGrey: "#dcdcdcff",
   colorAlert: "#edefa9ff",
+  colorAlertDark: "#8a9327ff",
   colorDanger: "#eea4a4ff",
 };

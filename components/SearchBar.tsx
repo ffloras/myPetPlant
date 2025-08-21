@@ -1,6 +1,5 @@
 import { theme } from "@/themes";
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
-import { useSearchStore } from "@/store/searchStore";
 
 type SearchBarProp = {
   visible: boolean;
@@ -19,7 +18,7 @@ export default function SearchBar({
         value={searchValue}
         onChangeText={(value) => setSearchValue(value)}
         style={styles.textInput}
-        placeholder="Search your plant collection"
+        placeholder="Search my plant collection"
       />
     </View>
   );

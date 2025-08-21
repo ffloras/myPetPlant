@@ -1,7 +1,6 @@
 import { View, StyleSheet, TextInput } from "react-native";
 import { theme } from "@/themes";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useWindowDimensions } from "react-native";
 
 type NotesInputType = {
   note?: string;
@@ -9,8 +8,6 @@ type NotesInputType = {
 };
 
 export default function NotesInput({ note, onChangeText }: NotesInputType) {
-  const { width } = useWindowDimensions();
-
   return (
     <View style={styles.inputRow}>
       <Ionicons

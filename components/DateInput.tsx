@@ -2,7 +2,6 @@ import { View, StyleSheet, Pressable, Text } from "react-native";
 import { theme } from "@/themes";
 import { format } from "date-fns";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useWindowDimensions } from "react-native";
 
 type DateInputType = {
   date?: Date;
@@ -10,8 +9,6 @@ type DateInputType = {
 };
 
 export default function DateInput({ date, onPress }: DateInputType) {
-  const { width } = useWindowDimensions();
-
   return (
     <View style={styles.inputRow}>
       <Ionicons
@@ -61,9 +58,6 @@ const styles = StyleSheet.create({
     borderColor: theme.colorLightGrey,
     borderRadius: 6,
     width: "55%",
-  },
-  buttonEdit: {
-    width: 155,
   },
   dateText: {
     color: theme.colorGrey,

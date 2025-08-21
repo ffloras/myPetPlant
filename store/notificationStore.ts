@@ -119,10 +119,8 @@ export const useNotificationStore = create(
           updatedNotifications = await handleTurnNotificationsOff(
             notifications
           );
-          console.log(updatedNotifications);
         } else {
           updatedNotifications = await handleTurnNotificationsOn(notifications);
-          console.log(updatedNotifications);
         }
         set((state) => ({
           ...state,
@@ -180,7 +178,7 @@ async function handleChangeNotificationTime(
     }
     updatedNotifications.push(newNotification);
   }
-  console.log(updatedNotifications);
+
   return updatedNotifications;
 }
 
@@ -272,7 +270,6 @@ async function handleDeleteNotification(
       updatedNotifications.push(notification);
     }
   }
-  console.log(updatedNotifications);
   return updatedNotifications;
 }
 
@@ -345,7 +342,7 @@ async function handleAddNotification(
     try {
       pushNotificationId = await scheduleNotification(triggerDate);
     } catch {
-      console.error("Unable to create notification");
+      console.log("Unable to create notification");
       return updatedNotifications;
     }
     const newNotification: notificationType = {
@@ -355,7 +352,6 @@ async function handleAddNotification(
     };
     updatedNotifications.push(newNotification);
   }
-  console.log(updatedNotifications);
   return updatedNotifications;
 }
 

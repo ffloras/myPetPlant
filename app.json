@@ -49,10 +49,18 @@
         "expo-font",
         {
           "fonts": [
-            "node_modules/@expo-google-fonts/shantell-sans/800ExtraBold/ShantellSans_800ExtraBold.ttf"
+            "node_modules/@expo-google-fonts/shantell-sans/800ExtraBold/ShantellSans_800ExtraBold.ttf",
+            "node_modules/@expo-google-fonts/quicksand/700Bold/Quicksand_700Bold.ttf"
           ]
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "311ad678-e108-42e9-ba68-6a7cdc705a12"
+      }
+    },
+    "owner": "fflor"
   }
 }

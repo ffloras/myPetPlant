@@ -1,21 +1,24 @@
 import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, View, Text, Alert } from "react-native";
-import PlantImagePicker from "@/app/components/PlantImagePicker";
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+  Alert,
+  Keyboard,
+} from "react-native";
+import PlantImagePicker from "@/components/PlantImagePicker";
 import * as ImagePicker from "expo-image-picker";
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
-import PlantActionButton from "@/app/components/PlantActionButton";
+import PlantActionButton from "@/components/PlantActionButton";
 import { theme } from "@/themes";
 import { PlantType, usePlantStore } from "@/store/plantStore";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useNotificationStore } from "@/store/notificationStore";
-import NameInput from "@/app/components/NameInput";
-import FrequencyInput from "@/app/components/FrequencyInput";
-import DateInput from "@/app/components/DateInput";
-import LastWateredInput from "@/app/components/LastWateredInput";
-import HeaderIcon from "@/app/components/HeaderIcon";
-import NotesInput from "@/app/components/NotesInput";
+import NameInput from "@/components/NameInput";
+import FrequencyInput from "@/components/FrequencyInput";
+import LastWateredInput from "@/components/LastWateredInput";
+import HeaderIcon from "@/components/HeaderIcon";
+import NotesInput from "@/components/NotesInput";
 
 export default function PlantEdit() {
   const router = useRouter();
@@ -42,10 +45,6 @@ export default function PlantEdit() {
   const [frequencyDays, setFrequenceDays] = useState<string | undefined>(
     plant?.wateringFrequencyDays.toString()
   );
-  // const [date, setDate] = useState<Date | undefined>(
-  //   plant ? new Date(plant.nextWateredAtTimestamp) : undefined
-  // );
-  // const [datePickerVisible, setDatePickerVisible] = useState<boolean>(false);
   const [lastWatered, setLastWatered] = useState<number | undefined>(
     plant ? plant.lastWateredAtTimestamp : undefined
   );
@@ -72,6 +71,7 @@ export default function PlantEdit() {
   };
 
   const handleAddNote = () => {
+    Keyboard.dismiss();
     setNotes((prev) => [...prev, undefined]);
   };
 
@@ -114,18 +114,6 @@ export default function PlantEdit() {
     }
   };
 
-  // const openDatePicker = () => {
-  //   setDatePickerVisible(true);
-  // };
-
-  // const onChangeDate = (
-  //   event: DateTimePickerEvent,
-  //   selectedDate: Date | undefined
-  // ) => {
-  //   setDate(selectedDate ?? new Date(Date.now()));
-  //   setDatePickerVisible(false);
-  // };
-
   const handleEditPlant = () => {
     if (!plantName) {
       return Alert.alert("Please enter a name", "Give your plant a nickname!");
@@ -147,26 +135,16 @@ export default function PlantEdit() {
         "Watering frequency must be a whole number"
       );
     }
-    // if (!date) {
-    //   return Alert.alert(
-    //     "Please enter a watering date",
-    //     `When is the next time ${
-    //       plantName ? plantName : "your plant?"
-    //     } needs to be watered?`
-    //   );
-    // }
-    // const endOfToday = new Date().setHours(23, 59, 59, 999);
-    // if (date.getTime() < endOfToday) {
-    //   return Alert.alert(
-    //     "Please re-enter the watering date",
-    //     `${date.toLocaleDateString()} is invalid. The next watering date must start on a future date`
-    //   );
-    // }
 
     if (!plant) {
       Alert.alert("Unable to update plant info", "Please try again");
       router.back();
       return;
+    }
+
+    let newNotes = notes.filter((note) => note);
+    if (newNotes.length === 0) {
+      newNotes = [undefined];
     }
 
     const editedPlant: PlantType = {
@@ -177,7 +155,7 @@ export default function PlantEdit() {
       lastWateredAtTimestamp: lastWatered,
       prevLastWateredAtTimestamp: prevLastWatered,
       imageUri: imageUri,
-      notes: notes,
+      notes: newNotes,
     };
 
     const prevNextWaterAtTimestamp = plant?.nextWateredAtTimestamp;
@@ -264,7 +242,6 @@ export default function PlantEdit() {
           frequencyDays={frequencyDays}
           onChangeText={setFrequenceDays}
         />
-        {/* <DateInput date={date} onPress={openDatePicker} type="edit" /> */}
         <LastWateredInput
           lastWatered={lastWatered}
           onPress={handleLastWateredDate}
@@ -292,14 +269,6 @@ export default function PlantEdit() {
         darkMode
         color={[theme.colorLightGrey, theme.colorLightGrey]}
       />
-      {/* {datePickerVisible ? (
-        <DateTimePicker
-          value={date ?? new Date(Date.now())}
-          mode="date"
-          display="default"
-          onChange={onChangeDate}
-        />
-      ) : undefined} */}
     </ScrollView>
   );
 }

@@ -866,6 +866,11 @@
     "@eslint/core" "^0.15.2"
     levn "^0.4.1"
 
+"@expo-google-fonts/quicksand@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/quicksand/-/quicksand-0.4.0.tgz#2004935a82e97ed100b07422f9e4a24e73aad79d"
+  integrity sha512-aR0OuptlhrFSgkUXWe66/mU4mv0/G1wGlFjFIRQX4AB5QRGUQ495XqswTgFlmkH2hxdyyGinyYQ8qX4firq/EA==
+
 "@expo-google-fonts/shantell-sans@^0.4.0":
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/shantell-sans/-/shantell-sans-0.4.0.tgz#e87ea2c2d80196cfe17eead31ff47844c6a5e6fa"

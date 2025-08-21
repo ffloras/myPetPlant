@@ -1,4 +1,4 @@
-import { Image, ImageStyle, useWindowDimensions } from "react-native";
+import { Image, useWindowDimensions } from "react-native";
 
 type ImageType = {
   size?: number;

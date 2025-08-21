@@ -1,22 +1,28 @@
 import { useState } from "react";
-import { ScrollView, StyleSheet, View, Alert, Text } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  Alert,
+  Text,
+  Keyboard,
+} from "react-native";
 import uuid from "react-native-uuid";
-import PlantImagePicker from "../components/PlantImagePicker";
+import PlantImagePicker from "../../components/PlantImagePicker";
 import * as ImagePicker from "expo-image-picker";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import PlantActionButton from "../components/PlantActionButton";
+import PlantActionButton from "../../components/PlantActionButton";
 import { PlantType, usePlantStore } from "@/store/plantStore";
 import { useRouter } from "expo-router";
 import { useNotificationStore } from "@/store/notificationStore";
-import NameInput from "../components/NameInput";
-import FrequencyInput from "../components/FrequencyInput";
-import DateInput from "../components/DateInput";
+import NameInput from "../../components/NameInput";
+import FrequencyInput from "../../components/FrequencyInput";
+import DateInput from "../../components/DateInput";
 import { theme } from "@/themes";
-import NotesInput from "../components/NotesInput";
-import HeaderIcon from "../components/HeaderIcon";
-import { useWindowDimensions } from "react-native";
+import NotesInput from "../../components/NotesInput";
+import HeaderIcon from "../../components/HeaderIcon";
 
 export default function NewPlant() {
   const addPlant = usePlantStore((store) => store.addPlant);
@@ -32,7 +38,6 @@ export default function NewPlant() {
   const [notes, setNotes] = useState<(string | undefined)[]>([undefined]);
   const [datePickerVisible, setDatePickerVisible] = useState<boolean>(false);
   const router = useRouter();
-  const { width } = useWindowDimensions();
 
   const handleChangeNotes = (value: string, noteNumber: number) => {
     setNotes((prev) => {
@@ -46,6 +51,7 @@ export default function NewPlant() {
   };
 
   const handleAddNote = () => {
+    Keyboard.dismiss();
     setNotes((prev) => [...prev, undefined]);
   };
 
@@ -138,8 +144,10 @@ export default function NewPlant() {
     }
 
     const plantId = uuid.v4();
-    const newNotes = notes.filter((note) => note);
-    console.log(newNotes);
+    let newNotes = notes.filter((note) => note);
+    if (newNotes.length === 0) {
+      newNotes = [undefined];
+    }
 
     const newPlant: PlantType = {
       id: plantId,

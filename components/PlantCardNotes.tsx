@@ -12,7 +12,7 @@ export default function PlantCardNotes({ notes, onPress }: PlantCardNoteType) {
   return (
     <View style={styles.container}>
       <Text>Notes</Text>
-      {!notes || notes.length === 0 ? (
+      {!notes || notes.length === 0 || (notes.length === 1 && !notes[0]) ? (
         <Text style={styles.noteText}>No notes available</Text>
       ) : (
         notes.map((note, index) => (

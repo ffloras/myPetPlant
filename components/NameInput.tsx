@@ -2,7 +2,6 @@ import { View, StyleSheet, TextInput } from "react-native";
 import { theme } from "@/themes";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Dispatch, SetStateAction } from "react";
-import { useWindowDimensions } from "react-native";
 
 type NameInputType = {
   plantName?: string;
@@ -10,8 +9,6 @@ type NameInputType = {
 };
 
 export default function NameInput({ plantName, onChangeText }: NameInputType) {
-  const { width } = useWindowDimensions();
-
   return (
     <View style={[styles.inputRow]}>
       <Ionicons

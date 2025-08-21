@@ -1,7 +1,6 @@
 import { theme } from "@/themes";
 import {
   ImageBackground,
-  ImageStyle,
   useWindowDimensions,
   Text,
   StyleSheet,

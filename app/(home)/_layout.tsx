@@ -1,7 +1,7 @@
 import { Redirect, Stack } from "expo-router";
 import { useUserStore } from "../../store/userStore";
 import { View } from "react-native";
-import HeaderIcon from "../components/HeaderIcon";
+import HeaderIcon from "../../components/HeaderIcon";
 import { useRouter } from "expo-router";
 import { useSearchStore } from "@/store/searchStore";
 
@@ -47,7 +47,7 @@ export default function Layout() {
       <Stack.Screen
         name="newPlant"
         options={{
-          title: "Add a new plant",
+          title: "Add a New Plant",
           presentation: "modal",
           animation: "fade",
         }}

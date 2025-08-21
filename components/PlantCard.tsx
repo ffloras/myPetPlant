@@ -10,7 +10,6 @@ import { useNotificationStore } from "@/store/notificationStore";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import PlantCardNotes from "./PlantCardNotes";
 
@@ -31,6 +30,12 @@ export default function PlantCard({ plant }: { plant: PlantType }) {
   const [datePickerVisible, setDatePickerVisible] = useState<boolean>(false);
   const [notesVisible, setNotesVisible] = useState<boolean>(false);
 
+  /**
+   * Changes the next watering date based on date selected by DateTimePicker.
+   * @param event - DateTimePicker event
+   * @param selectedDate - date selected by DateTimePicker (must be greater than today)
+   * @returns void
+   */
   const onChangeDate = (
     event: DateTimePickerEvent,
     selectedDate: Date | undefined
@@ -39,14 +44,14 @@ export default function PlantCard({ plant }: { plant: PlantType }) {
       return;
     }
     const endOfToday = new Date().setHours(23, 59, 59, 999);
-    // if (selectedDate.getTime() < endOfToday) {
-    //   Alert.alert(
-    //     "Please re-enter the watering date",
-    //     `${selectedDate.toLocaleDateString()} is invalid. The next watering date must start on a future date`
-    //   );
-    //   setDatePickerVisible(false);
-    //   return;
-    // }
+    if (selectedDate.getTime() < endOfToday) {
+      Alert.alert(
+        "Please re-enter the watering date",
+        `${selectedDate.toLocaleDateString()} is invalid. The next watering date must start on a future date`
+      );
+      setDatePickerVisible(false);
+      return;
+    }
     const prevNextWateredAtTimestamp = plant.nextWateredAtTimestamp;
     const newNextWateredAtTimestamp = selectedDate.getTime();
     updateNotification(
@@ -76,7 +81,7 @@ export default function PlantCard({ plant }: { plant: PlantType }) {
           </View>
         ),
       };
-    } else if (nextWatering > startOfToday) {
+    } else if (nextWatering >= startOfToday) {
       return {
         status: "alert",
         message: (
@@ -89,7 +94,7 @@ export default function PlantCard({ plant }: { plant: PlantType }) {
         ),
       };
     } else {
-      const overdueDays = differenceInDays(Date.now(), nextWatering);
+      const overdueDays = differenceInDays(endOfToday, nextWatering);
       return {
         status: "danger",
         message: (
@@ -127,12 +132,6 @@ export default function PlantCard({ plant }: { plant: PlantType }) {
       plant.id,
       prevNextWaterAtTimestamp,
       currentNextWateredAtTimestamp
-    );
-
-    console.log(
-      prevNextWaterAtTimestamp,
-      currentNextWateredAtTimestamp,
-      plant.wateringFrequencyDays
     );
     waterPlant(plant.id);
   };
@@ -233,7 +232,10 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 6,
     borderTopRightRadius: 6,
     flexDirection: "row",
-    padding: 4,
+    paddingLeft: 2,
+    paddingRight: 4,
+    paddingTop: 2,
+    paddingBottom: 4,
     justifyContent: "space-between",
     alignItems: "center",
   },

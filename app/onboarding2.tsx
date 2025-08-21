@@ -1,9 +1,8 @@
 import { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import { useUserStore } from "../store/userStore";
 import { useRouter } from "expo-router";
-import PlantImage from "./components/PlantImage";
 import { theme } from "@/themes";
-import OnboardingImage from "./components/OnboardingImage";
+import OnboardingImage from "../components/OnboardingImage";
 import { useWindowDimensions } from "react-native";
 
 export default function Onboarding() {
@@ -79,11 +78,11 @@ const styles = StyleSheet.create({
   },
   headingText: {
     fontSize: 36,
-    fontWeight: "bold",
+    fontFamily: "ShantellSans_800ExtraBold",
   },
   descriptionText: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Quicksand_700Bold",
   },
   leaves: {
     paddingBottom: 48,

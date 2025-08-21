@@ -1,26 +1,16 @@
-import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, Pressable, FlatList } from "react-native";
-import { useUserStore } from "../../store/userStore";
 import { useRouter } from "expo-router";
 import { PlantType, usePlantStore } from "@/store/plantStore";
-import PlantCard from "../components/PlantCard";
+import PlantCard from "../../components/PlantCard";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { useSearchStore } from "@/store/searchStore";
-import { useEffect, useRef, useState } from "react";
-import SearchBar from "../components/SearchBar";
+import { useEffect, useState } from "react";
+import SearchBar from "../../components/SearchBar";
 import { theme } from "@/themes";
-import ListEmpty from "../components/ListEmpty";
+import ListEmpty from "../../components/ListEmpty";
 import * as SystemUI from "expo-system-ui";
 
 SystemUI.setBackgroundColorAsync(theme.colorPaleGreen);
-
-const dummyPlant: PlantType = {
-  id: "1234",
-  name: "Bob",
-  wateringFrequencyDays: 10,
-  nextWateredAtTimestamp: 1754952060000,
-  lastWateredAtTimestamp: 1758193160000,
-};
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<PlantType>);
 
@@ -30,7 +20,6 @@ export default function App() {
   const [plantsList, setPlantsList] = useState<PlantType[]>(plants);
   const [searchText, setSearchText] = useState<string>();
   const router = useRouter();
-  // const flatListRef = useRef<FlatList<PlantType>>(null);
 
   //reset search bar and plant cards when opening/closing search bar
   useEffect(() => {
@@ -62,8 +51,6 @@ export default function App() {
   return (
     <AnimatedFlatList
       data={sortPlantsByDate(plantsList)}
-      // data={[]}
-      // ref={flatListRef}
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       renderItem={({ item }: { item: PlantType }) => (

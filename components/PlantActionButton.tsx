@@ -63,8 +63,9 @@ const styles = StyleSheet.create({
   text: {
     color: theme.colorWhite,
     fontSize: 20,
-    fontWeight: "bold",
     textAlign: "center",
+    fontWeight: "bold",
+    paddingBottom: 2,
   },
   textDark: {
     color: theme.colorGrey,
